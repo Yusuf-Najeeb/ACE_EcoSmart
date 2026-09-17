@@ -1735,24 +1735,25 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const port = Number(process.env.PORT || 3000);
   const { server, db } = createApp();
 
-  // Bootstrap initial administrators for live testing and operations
-  const adminEmails = ['yusnaj21@gmail.com', 'yusnaj21@yahoo.com'];
-  if (process.env.ADMIN_EMAIL) {
-    adminEmails.unshift(process.env.ADMIN_EMAIL.trim().toLowerCase());
-  }
+  // Bootstrap initial administrator for live testing and operations
+  const adminEmail = (process.env.ADMIN_EMAIL || 'yusnaj21@yahoo.com').trim().toLowerCase();
   const now = Date.now();
-  for (const adminEmail of adminEmails) {
-    const existing = db.prepare('SELECT id, role FROM users WHERE email=?').get(adminEmail);
-    if (!existing) {
-      db.prepare(`
-        INSERT INTO users (id, role, name, email, area, verification_status, account_status, created_at, updated_at)
-        VALUES (?, 'administrator', 'Najeeb Yusuf (Admin)', ?, 'Headquarters, Lagos', 'verified', 'active', ?, ?)
-      `).run(randomUUID(), adminEmail, now, now);
-      console.log(`[EcoSmart] Bootstrapped administrator account: ${adminEmail}`);
-    } else if (existing.role !== 'administrator') {
-      db.prepare("UPDATE users SET role='administrator', updated_at=? WHERE email=?").run(now, adminEmail);
-      console.log(`[EcoSmart] Promoted user to administrator: ${adminEmail}`);
-    }
+  const existing = db.prepare('SELECT id, role FROM users WHERE email=?').get(adminEmail);
+  if (!existing) {
+    db.prepare(`
+      INSERT INTO users (id, role, name, email, area, verification_status, account_status, created_at, updated_at)
+      VALUES (?, 'administrator', 'Najeeb Yusuf (Admin)', ?, 'Headquarters, Lagos', 'verified', 'active', ?, ?)
+    `).run(randomUUID(), adminEmail, now, now);
+    console.log(`[EcoSmart] Bootstrapped administrator account: ${adminEmail}`);
+  } else if (existing.role !== 'administrator') {
+    db.prepare("UPDATE users SET role='administrator', updated_at=? WHERE email=?").run(now, adminEmail);
+    console.log(`[EcoSmart] Promoted user to administrator: ${adminEmail}`);
+  }
+
+  // Ensure yusnaj21@gmail.com is not an administrator
+  const gmailUser = db.prepare("SELECT id, role FROM users WHERE email='yusnaj21@gmail.com'").get();
+  if (gmailUser && gmailUser.role === 'administrator') {
+    db.prepare("UPDATE users SET role='generator', updated_at=? WHERE email='yusnaj21@gmail.com'").run(now);
   }
 
   const host = process.env.HOST || '0.0.0.0';
