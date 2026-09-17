@@ -193,7 +193,7 @@
           </div>
         </div>
 
-        <!-- Intake Categorization & Preview Card -->
+        <!-- Attached Photo Preview & AI Detection Status -->
         <div id="intake-preview-panel" class="intake-preview-panel" hidden>
           <div class="intake-preview-inner">
             <div class="intake-thumbnail-box">
@@ -205,23 +205,30 @@
                 <span class="intake-confidence-pill" id="intake-confidence-pill">Select category</span>
                 <button type="button" class="btn-clear-photo" id="btn-clear-intake-photo" title="Remove photo">✕ Remove photo</button>
               </div>
-
-              <div class="category-dropdown-group">
-                <label for="intake-category-select" class="category-select-label">Category of this item <span class="req">*</span></label>
-                <select id="intake-category-select" class="category-dropdown-select">
-                  <option value="" disabled selected>-- Select category of your item --</option>
-                  <!-- Populated dynamically and fallback items -->
-                  <option value="cardboard">📦 Cardboard (boxes, packaging)</option>
-                  <option value="pet_plastic_bottles">🧴 PET plastic bottles (beverage containers)</option>
-                  <option value="aluminium">🥫 Aluminium (cans, clean scrap)</option>
-                  <option value="brass">🔩 Brass (fittings, valves, fixtures)</option>
-                  <option value="glass">🍾 Glass (bottles, jars)</option>
-                  <option value="unsupported">❓ Other / Non-pilot material</option>
-                </select>
+              <p class="muted" id="intake-detected-desc" style="font-size: 12.5px; margin: 4px 0 0;">Photo attached. AI will suggest a category or you can select one below.</p>
+              <div class="valuation-callout" id="intake-valuation-callout" style="display: none; margin-top: 8px; padding: 6px 10px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 6px; font-size: 13px; color: #166534; font-weight: 500;">
+                <span class="val-icon">💰</span> <strong id="intake-valuation-label">Estimated Value:</strong> <span id="intake-valuation-text">5kg of plastic will fetch approx ₦1,000</span>
               </div>
-              <p class="muted" id="intake-detected-desc" style="font-size: 12.5px; margin: 4px 0 0;">Select or confirm the material category to view preparation tips and connect with verified buyers.</p>
             </div>
           </div>
+        </div>
+
+        <!-- Material Category Selection (Always Accessible) -->
+        <div class="category-selection-section" id="category-selection-section" style="margin-top: 1rem;">
+          <div class="category-dropdown-group">
+            <label for="intake-category-select" class="category-select-label">Category of your item <span class="req">*</span></label>
+            <select id="intake-category-select" class="category-dropdown-select">
+              <option value="" disabled selected>-- Select category of your item --</option>
+              <!-- Populated dynamically and fallback items -->
+              <option value="cardboard">📦 Cardboard (boxes, packaging)</option>
+              <option value="pet_plastic_bottles">🧴 PET plastic bottles (beverage containers)</option>
+              <option value="aluminium">🥫 Aluminium (cans, clean scrap)</option>
+              <option value="brass">🔩 Brass (fittings, valves, fixtures)</option>
+              <option value="glass">🍾 Glass (bottles, jars)</option>
+              <option value="unsupported">❓ Other / Non-pilot material</option>
+            </select>
+          </div>
+          <p class="hint" id="category-select-hint">Select the category of recyclable material you have, or scan/upload a photo above for automatic identification.</p>
         </div>
 
         <!-- Guidance Panel (Supported Recyclable Item) -->
@@ -233,6 +240,9 @@
           <div class="guidance-body">
             <p class="guidance-label">Preparation &amp; Recycling Tips:</p>
             <p class="guidance-tip" id="guidance-tip-text">Keep dry and flatten boxes. Remove heavy packaging tape and plastic inserts before collection.</p>
+            <div class="guidance-valuation-box" id="guidance-valuation-box" style="margin-top: 10px; padding: 8px 12px; background: rgba(34, 197, 94, 0.08); border-left: 3px solid #16a34a; border-radius: 4px; font-size: 13.5px; color: #15803d;">
+              <span class="val-icon">💰</span> <strong>Benchmark Value:</strong> <span id="guidance-valuation-text">5kg of plastic will fetch approx ₦1,000 (market rate: ~₦200/kg)</span>
+            </div>
           </div>
           <div class="guidance-action-row">
             <button id="find-recyclers-btn" type="button" class="primary">Find recyclers in your area <span aria-hidden="true">→</span></button>
@@ -751,71 +761,32 @@
             </div>
             <p class="handover-note-text" id="screen6-agreed-instructions">Driver arriving tomorrow between 10am–12pm.</p>
 
-            <div class="coordination-actions-row">
-              <button type="button" class="btn-call-action" id="btn-screen6-start-call">
-                <span class="call-icon" aria-hidden="true">📞</span> Start In-App Call
-              </button>
+            <!-- Generator Handover Verification OTP Card -->
+            <div class="handover-otp-box" id="screen6-generator-otp-box" style="margin: 12px 0; padding: 14px; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 8px;" hidden>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: #15803d; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                  🛡️ Handover Confirmation Code
+                </span>
+                <span style="font-size: 11.5px; color: #64748b;">Disclose only upon physical material exchange</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin: 10px 0;">
+                <span id="screen6-otp-display" style="font-family: monospace; font-size: 28px; font-weight: 800; letter-spacing: 8px; color: #166534; background: #ffffff; padding: 6px 16px; border: 1px solid #bbf7d0; border-radius: 6px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">----</span>
+              </div>
+              <p style="font-size: 12px; color: #166534; margin: 0;">Provide this 4-digit code to the recycler when they physically collect or receive the waste to verify handover.</p>
             </div>
 
+            <!-- Recycler Handover Completion Row with OTP Entry -->
             <div id="screen6-recycler-complete-row" class="handover-complete-row" hidden>
-              <p class="muted" style="font-size: 13px; margin-bottom: 8px;">After physical materials are exchanged, mark the handover completed to proceed to inspection and final offer.</p>
-              <button type="button" class="primary" id="btn-mark-handover-complete">Handover completed / Proceed to inspection <span aria-hidden="true">→</span></button>
+              <p class="muted" style="font-size: 13px; margin-bottom: 8px;">After physical materials are exchanged, enter the generator's 4-digit code to verify handover and proceed to inspection.</p>
+              <div style="margin-bottom: 12px;">
+                <label for="recycler-handover-otp-input" style="font-size: 12.5px; font-weight: 600; display: block; margin-bottom: 4px; color: #334155;">Generator's 4-Digit Handover Code:</label>
+                <input type="text" id="recycler-handover-otp-input" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="e.g. 4829" style="max-width: 160px; font-size: 18px; letter-spacing: 4px; text-align: center; padding: 6px 10px; font-weight: 700; border: 1.5px solid #94a3b8; border-radius: 6px;">
+              </div>
+              <button type="button" class="primary" id="btn-mark-handover-complete">Verify Handover &amp; Proceed to Inspection <span aria-hidden="true">→</span></button>
             </div>
             <div id="screen6-proceed-screen7-row" style="margin-top: 12px;" hidden>
               <button type="button" class="primary" id="btn-goto-screen7">Proceed to Inspection &amp; Final Offer <span aria-hidden="true">→</span></button>
             </div>
-          </div>
-
-          <!-- IN-APP CALL (FR-19) -->
-          <div class="call-section" id="screen6-call-section" hidden>
-            <!-- Incoming Call Banner -->
-            <div class="call-banner incoming-call-banner" id="incoming-call-box" hidden>
-              <div class="call-banner-left">
-                <span class="call-pulse-ring">📞</span>
-                <div>
-                  <h4 class="call-title" id="incoming-caller-title">Incoming In-App Call…</h4>
-                  <p class="call-subtitle" id="incoming-caller-subtitle">Verified Recycler is calling you</p>
-                </div>
-              </div>
-              <div class="call-actions-row">
-                <button type="button" class="btn-call-answer" id="btn-call-answer">✓ Answer</button>
-                <button type="button" class="btn-call-decline" id="btn-call-decline">✕ Decline</button>
-              </div>
-            </div>
-
-            <!-- Outgoing Ringing Banner -->
-            <div class="call-banner outgoing-call-banner" id="outgoing-call-box" hidden>
-              <div class="call-banner-left">
-                <span class="call-pulse-ring outgoing">📞</span>
-                <div>
-                  <h4 class="call-title">Calling…</h4>
-                  <p class="call-subtitle" id="outgoing-call-subtitle">Ringing participant…</p>
-                </div>
-              </div>
-              <div class="call-actions-row">
-                <button type="button" class="btn-call-end" id="btn-call-cancel">Cancel Call</button>
-              </div>
-            </div>
-
-            <!-- Active Connected Call Box -->
-            <div class="call-banner active-call-box" id="active-call-box" hidden>
-              <div class="call-banner-left">
-                <span class="call-connected-dot"></span>
-                <div>
-                  <div class="active-call-header">
-                    <h4 class="call-title" id="active-call-title">In-App Voice Call</h4>
-                    <span class="call-timer-badge" id="call-duration-timer">00:00</span>
-                  </div>
-                  <p class="call-subtitle" id="active-call-participant">Connected with Verified Recycler</p>
-                </div>
-              </div>
-              <div class="call-actions-row">
-                <button type="button" class="btn-call-mute" id="btn-call-mute">🎤 Mute</button>
-                <button type="button" class="btn-call-end" id="btn-call-end">End Call</button>
-              </div>
-            </div>
-
-            <div id="call-feedback-msg" class="call-feedback" hidden></div>
           </div>
 
           <!-- IN-APP CHAT (FR-18) -->

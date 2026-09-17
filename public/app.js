@@ -1,3 +1,11 @@
+const BENCHMARK_VALUATION_MAP = {
+  cardboard: '5kg of cardboard will fetch approx ₦750 (market rate: ~₦150/kg)',
+  pet_plastic_bottles: '5kg of plastic bottles will fetch approx ₦1,000 (market rate: ~₦200/kg)',
+  aluminium: '2kg of aluminium cans will fetch approx ₦1,500 (market rate: ~₦750/kg)',
+  brass: '1kg of clean brass will fetch approx ₦2,500 (market rate: ~₦2,500/kg)',
+  glass: '10kg of glass bottles will fetch approx ₦800 (market rate: ~₦80/kg)'
+};
+
 const $ = id => document.getElementById(id);
 let pending = null;
 let pendingLogin = null;
@@ -292,6 +300,12 @@ async function selectMaterialCategory(materialId, method = 'manual selection') {
 
   if ($('guidance-material-title')) $('guidance-material-title').textContent = mat.name;
   if ($('guidance-tip-text')) $('guidance-tip-text').textContent = mat.guidance;
+
+  const valText = BENCHMARK_VALUATION_MAP[materialId];
+  if (valText && $('guidance-valuation-text')) {
+    $('guidance-valuation-text').textContent = valText;
+    if ($('guidance-valuation-box')) $('guidance-valuation-box').hidden = false;
+  }
   if ($('find-recyclers-btn')) {
     $('find-recyclers-btn').innerHTML = `Find recyclers in ${currentUser?.area || 'your area'} <span aria-hidden="true">→</span>`;
   }
@@ -307,6 +321,7 @@ function resetGeneratorSelection() {
   if ($('unsupported-panel')) $('unsupported-panel').hidden = true;
   if ($('intake-confirmed-panel')) $('intake-confirmed-panel').hidden = true;
   if ($('intake-preview-panel')) $('intake-preview-panel').hidden = true;
+  if ($('intake-valuation-callout')) $('intake-valuation-callout').style.display = 'none';
   if ($('intake-scan-file')) $('intake-scan-file').value = '';
   if ($('intake-upload-file')) $('intake-upload-file').value = '';
 }
@@ -432,6 +447,11 @@ async function processIntakePhotoData(dataUrl, method, fileName = 'item_photo.jp
     });
 
     if (res.detectedMaterialId && res.detectedMaterialId !== 'unsupported') {
+      const valTip = res.estimatedValueTip || BENCHMARK_VALUATION_MAP[res.detectedMaterialId];
+      if (valTip && $('intake-valuation-text')) {
+        $('intake-valuation-text').textContent = valTip;
+        if ($('intake-valuation-callout')) $('intake-valuation-callout').style.display = 'block';
+      }
       if ($('intake-confidence-pill')) $('intake-confidence-pill').textContent = res.confidence === 'high' ? 'Auto Detected' : 'Suggestion';
       if ($('intake-detected-desc')) $('intake-detected-desc').textContent = `${res.guidance || 'Category matched.'} Please confirm or select another category if needed.`;
       await selectMaterialCategory(res.detectedMaterialId, method);
@@ -449,11 +469,40 @@ async function processIntakePhotoData(dataUrl, method, fileName = 'item_photo.jp
   }
 }
 
+async function compressImage(dataUrl, maxDim = 1024, quality = 0.85) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width;
+      let h = img.height;
+      if (w <= maxDim && h <= maxDim) {
+        return resolve(dataUrl);
+      }
+      if (w > h) {
+        h = Math.round((h * maxDim) / w);
+        w = maxDim;
+      } else {
+        w = Math.round((w * maxDim) / h);
+        h = maxDim;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 async function handleIntakeFile(file, method) {
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
-    processIntakePhotoData(e.target.result, method, file.name);
+  reader.onload = async e => {
+    const compressed = await compressImage(e.target.result);
+    processIntakePhotoData(compressed, method, file.name);
   };
   reader.readAsDataURL(file);
 }
@@ -882,11 +931,23 @@ async function showListingScreen6(listingId) {
         $('screen6-recycler-complete-row').hidden = true;
       }
 
-      // In-App Call & Chat controls
-      if ($('btn-screen6-start-call')) $('btn-screen6-start-call').hidden = false;
-      pollCallStatus(listing.id);
-      if (callPollInterval) clearInterval(callPollInterval);
-      callPollInterval = setInterval(() => pollCallStatus(listing.id), 3000);
+      // Handover Verification OTP Card (Generator view)
+      if (isGenerator && listing.status === 'accepted') {
+        if ($('screen6-generator-otp-box')) $('screen6-generator-otp-box').hidden = false;
+        if ($('screen6-otp-display')) $('screen6-otp-display').textContent = listing.handover_code || '----';
+      } else {
+        if ($('screen6-generator-otp-box')) $('screen6-generator-otp-box').hidden = true;
+      }
+
+      // Handover Completion Row (Recycler view)
+      if (isRecycler && listing.status === 'accepted') {
+        if ($('screen6-recycler-complete-row')) $('screen6-recycler-complete-row').hidden = false;
+        if ($('recycler-handover-otp-input')) $('recycler-handover-otp-input').value = '';
+      } else {
+        if ($('screen6-recycler-complete-row')) $('screen6-recycler-complete-row').hidden = true;
+      }
+
+      // Voice calls disabled; direct users to Chat
 
       if ($('screen6-chat-section')) {
         $('screen6-chat-section').hidden = false;
@@ -1850,11 +1911,19 @@ if ($('btn-decline-listing')) {
 if ($('btn-mark-handover-complete')) {
   $('btn-mark-handover-complete').addEventListener('click', () => {
     if (!currentListing) return;
-    perform($('btn-mark-handover-complete'), 'Recording handover…', async () => {
+    const otpInput = $('recycler-handover-otp-input');
+    const handoverCode = otpInput?.value.trim();
+    if (!handoverCode || handoverCode.length !== 4) {
+      error('Please enter the 4-digit handover confirmation code provided by the generator.');
+      if (otpInput) otpInput.focus();
+      return;
+    }
+    perform($('btn-mark-handover-complete'), 'Verifying handover code…', async () => {
       const res = await api('/api/recycler/listings/handover-complete', {
-        listingId: currentListing.id
+        listingId: currentListing.id,
+        handoverCode
       });
-      notice('Handover marked complete!');
+      notice('Physical handover verified with confirmation code! Proceed to inspection.');
       await showListingScreen6(currentListing.id);
       const state = await api('/api/state');
       incomingRequests = state.incomingRequests || [];

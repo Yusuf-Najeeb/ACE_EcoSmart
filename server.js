@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AppError, createEmailProvider } from './email.js';
 import { openStorage, verificationKey } from './storage.js';
+import { analyzeWasteImage } from './vision.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -47,7 +48,7 @@ export function validate(input) {
   return { role: input.role, name, area, email };
 }
 
-export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), provider = createEmailProvider(), origin = process.env.APP_ORIGIN || 'http://localhost:3000', demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now } = {}) {
+export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), provider = createEmailProvider(), origin = process.env.APP_ORIGIN || 'http://localhost:3000', demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now, visionAnalyzer = analyzeWasteImage } = {}) {
   const db = openStorage(dbPath);
   const key = verificationKey(dbPath);
   const codeHash = (id, code) => createHmac('sha256', key).update(`${id}:${code}`).digest('hex');
@@ -138,6 +139,9 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
       listing.recycler_phone = null;
       listing.recycler_yard_address = null;
     }
+    if (user.role !== 'generator' && listing.status === 'accepted') {
+      listing.handover_code = null;
+    }
     return shared;
   }
 
@@ -227,6 +231,11 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
         WHERE l.recycler_user_id=?
         ORDER BY l.created_at DESC
       `).all(user.id);
+      if (incomingRequests) {
+        incomingRequests.forEach(req => {
+          if (req.status === 'accepted') req.handover_code = null;
+        });
+      }
       const sumRow = db.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM wallet_payments WHERE payer_user_id=? AND payment_type='generator payout' AND status='released'").get(user.id);
       lifetimeTotal = sumRow ? sumRow.total : 0;
     } else if (user.role === 'generator') {
@@ -658,9 +667,9 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
           if (!user) throw new AppError(401, 'Please sign in to analyze recyclable waste.');
           if (user.role !== 'generator') throw new AppError(403, 'Only generators can analyze recyclable waste.');
           
-          return json(200, { ok: true, detected: false, detectedMaterialId: null, materialId: null,
-            confidence: 'unavailable', material: null, isSupported: false,
-            guidance: 'Image recognition is not available. Select the material manually; your photo can be attached to the listing.' });
+          const photoFile = input.photoFile || input.file || null;
+          const analysis = await visionAnalyzer({ photoFile });
+          return json(200, analysis);
         }
         if (path === '/api/generator/matches') {
           const user = account(req);
@@ -843,7 +852,11 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
 
           db.exec('BEGIN IMMEDIATE');
           try {
-            const claimed = db.prepare("UPDATE listings SET status=?, updated_at=? WHERE id=? AND status='sent to recycler'").run(decision, time, listingId);
+            let handoverCode = null;
+            if (decision === 'accepted') {
+              handoverCode = String(randomInt(1000, 10000));
+            }
+            const claimed = db.prepare("UPDATE listings SET status=?, handover_code=?, updated_at=? WHERE id=? AND status='sent to recycler'").run(decision, handoverCode, time, listingId);
             if (claimed.changes !== 1) throw new AppError(409, 'This listing was already answered. Refresh to see its current status.');
             if (decision === 'accepted') {
               const agreedArrangement = ['pickup', 'drop-off'].includes(input.agreedArrangement) ? input.agreedArrangement : (listing.preferred_arrangement || 'pickup');
@@ -918,6 +931,13 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
           if (listing.recycler_user_id !== user.id) throw new AppError(403, 'You are not the designated recipient of this listing.');
           if (listing.status !== 'accepted') throw new AppError(400, 'Listing must be accepted before marking handover complete.');
 
+          if (listing.handover_code && (input.handoverCode !== undefined || input.handover_code !== undefined)) {
+            const enteredCode = String(input.handoverCode || input.handover_code || '').trim();
+            if (!enteredCode || enteredCode !== listing.handover_code) {
+              throw new AppError(400, 'Invalid handover confirmation code. Please enter the 4-digit code provided by the generator.');
+            }
+          }
+
           const time = now();
           db.exec('BEGIN IMMEDIATE');
           try {
@@ -964,6 +984,12 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
           if (listing.recycler_user_id !== user.id) throw new AppError(403, 'You are not the designated recycler for this listing.');
           if (!['accepted', 'handover arranged'].includes(listing.status)) {
             throw new AppError(400, `Cannot submit offer on a listing with status '${listing.status}'.`);
+          }
+          if (listing.status === 'accepted' && listing.handover_code && (input.handoverCode !== undefined || input.handover_code !== undefined)) {
+            const enteredCode = String(input.handoverCode || input.handover_code || '').trim();
+            if (!enteredCode || enteredCode !== listing.handover_code) {
+              throw new AppError(400, 'Invalid handover confirmation code. Please verify handover with the generator before recording inspection.');
+            }
           }
 
           const time = now();

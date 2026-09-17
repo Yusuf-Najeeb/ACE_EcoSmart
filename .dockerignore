@@ -1,0 +1,36 @@
+# Docker / Container Build Ignore File
+
+# Documentation and Specifications
+docs/
+*.pdf
+*.md
+!README.md
+
+# Development / Agent Tooling
+.gstack/
+review/
+
+# Local databases and runtime state
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.key
+
+# Tests and Test Utilities
+test/
+test-support/
+
+# Environment files
+.env
+local.env
+*.env
+.env.*
+!.env.example
+
+# Logs and OS metadata
+*.log
+.DS_Store
+Thumbs.db
+.git
+.gitignore

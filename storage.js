@@ -127,6 +127,7 @@ export function openStorage(dbPath) {
       estimated_price REAL,
       price_unit TEXT,
       status TEXT NOT NULL CHECK(status IN ('draft', 'sent to recycler', 'accepted', 'declined', 'handover arranged', 'inspected', 'funded final offer', 'completed', 'rejected', 'offer rejected', 'expired')),
+      handover_code TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
@@ -283,6 +284,11 @@ export function openStorage(dbPath) {
   const intakeCols = db.prepare('PRAGMA table_info(material_intakes)').all().map(c => c.name);
   if (intakeCols.length > 0 && !intakeCols.includes('photo_file')) {
     db.exec('ALTER TABLE material_intakes ADD COLUMN photo_file TEXT');
+  }
+
+  const listingCols = db.prepare('PRAGMA table_info(listings)').all().map(c => c.name);
+  if (listingCols.length > 0 && !listingCols.includes('handover_code')) {
+    db.exec('ALTER TABLE listings ADD COLUMN handover_code TEXT');
   }
 
   const now = Date.now();
