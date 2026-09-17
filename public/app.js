@@ -2458,9 +2458,18 @@ function renderAdminApplications() {
       <div class="app-docs-box">
         <span class="app-detail-label">Submitted Verification Files</span>
         <div class="app-docs-grid">
-          <div class="doc-badge">🪪 ID Document: ${app.gov_id_file ? (app.gov_id_file.startsWith('data:') ? '<a href="' + app.gov_id_file + '" target="_blank" download="gov_id">View / Download</a>' : '✓ Attached') : 'None'}</div>
-          <div class="doc-badge">📷 Recycler Photo: ${app.photo_file ? (app.photo_file.startsWith('data:') ? '<a href="' + app.photo_file + '" target="_blank" download="photo">View / Download</a>' : '✓ Attached') : 'None'}</div>
-          <div class="doc-badge">📜 Licence / Permit: ${app.licence_file ? (app.licence_file.startsWith('data:') ? '<a href="' + app.licence_file + '" target="_blank" download="licence">View / Download</a>' : '✓ Attached') : 'None'}</div>
+          <div class="doc-badge">
+            <span class="doc-badge-label">🪪 ID Document</span>
+            ${app.gov_id_file ? (app.gov_id_file.startsWith('data:') ? `<a href="${app.gov_id_file}" target="_blank" download="gov_id_${app.id.slice(0, 6)}" class="doc-download-btn"><span>View / Download</span><span class="doc-arrow">↗</span></a>` : '<span class="doc-attached-tag">✓ Attached</span>') : '<span class="doc-missing-tag">Not provided</span>'}
+          </div>
+          <div class="doc-badge">
+            <span class="doc-badge-label">📷 Recycler Photo</span>
+            ${app.photo_file ? (app.photo_file.startsWith('data:') ? `<a href="${app.photo_file}" target="_blank" download="photo_${app.id.slice(0, 6)}" class="doc-download-btn"><span>View / Download</span><span class="doc-arrow">↗</span></a>` : '<span class="doc-attached-tag">✓ Attached</span>') : '<span class="doc-missing-tag">Not provided</span>'}
+          </div>
+          <div class="doc-badge">
+            <span class="doc-badge-label">📜 Licence / Permit</span>
+            ${app.licence_file ? (app.licence_file.startsWith('data:') ? `<a href="${app.licence_file}" target="_blank" download="licence_${app.id.slice(0, 6)}" class="doc-download-btn"><span>View / Download</span><span class="doc-arrow">↗</span></a>` : '<span class="doc-attached-tag">✓ Attached</span>') : '<span class="doc-missing-tag">Not provided</span>'}
+          </div>
         </div>
       </div>
 
@@ -2470,26 +2479,97 @@ function renderAdminApplications() {
         </div>
       ` : ''}
 
-      <div class="review-actions-box">
-        <label for="admin-note-${app.id}" class="app-detail-label">Administrator Decision Note</label>
-        <input id="admin-note-${app.id}" placeholder="${app.status === 'approved' ? 'Update review notes...' : 'Enter approval notes or specific rejection reasons...'}" style="margin-top: 4px; margin-bottom: 8px;" value="${app.admin_note || ''}">
-        <div class="review-btn-row">
-          <button type="button" class="btn-pill btn-approve admin-btn-approve" data-id="${app.id}">✓ ${app.status === 'approved' ? 'Re-Approve Profile' : 'Approve Recycler'}</button>
-          <button type="button" class="btn-pill btn-reject admin-btn-reject" data-id="${app.id}">✕ ${app.status === 'rejected' ? 'Update Rejection Note' : 'Reject Application'}</button>
-          <span class="muted" style="font-size: 12px; margin-left: auto;">Submitted ${createdTime}</span>
+      ${app.status === 'approved' ? `
+        <div class="review-actions-box review-box-approved">
+          <div class="review-status-banner banner-approved">
+            <span class="status-dot dot-green"></span>
+            <span><strong>Verified Recycler (Active):</strong> This account is approved and currently authorized to accept scrap listings and negotiate prices.</span>
+          </div>
+          <label for="admin-note-${app.id}" class="app-detail-label">Administrator Action Note</label>
+          <input id="admin-note-${app.id}" placeholder="Enter specific reason if suspending or revoking, or update internal notes..." style="margin-top: 4px; margin-bottom: 8px;" value="${app.admin_note || ''}">
+          <div class="review-btn-row">
+            <button type="button" class="btn-pill btn-suspend admin-btn-suspend" data-id="${app.id}">⏸ Suspend Recycler</button>
+            <button type="button" class="btn-pill btn-revoke admin-btn-revoke" data-id="${app.id}">🚫 Revoke Verification</button>
+            <button type="button" class="btn-pill btn-update-note admin-btn-save-note" data-id="${app.id}">✎ Save Note Only</button>
+            <span class="muted" style="font-size: 12px; margin-left: auto;">Reviewed ${reviewedTime || createdTime}</span>
+          </div>
         </div>
-      </div>
+      ` : (app.status === 'rejected' ? `
+        <div class="review-actions-box review-box-rejected">
+          <div class="review-status-banner banner-rejected">
+            <span class="status-dot dot-red"></span>
+            <span><strong>Account Status: Suspended / Rejected</strong>${app.admin_note ? ` — "${app.admin_note}"` : ''}</span>
+          </div>
+          <label for="admin-note-${app.id}" class="app-detail-label">Reinstatement / Decision Note</label>
+          <input id="admin-note-${app.id}" placeholder="Enter note to reinstate or update rejection note..." style="margin-top: 4px; margin-bottom: 8px;" value="${app.admin_note || ''}">
+          <div class="review-btn-row">
+            <button type="button" class="btn-pill btn-reinstate admin-btn-approve" data-id="${app.id}">✓ Re-instate & Approve</button>
+            <button type="button" class="btn-pill btn-update-note admin-btn-save-note-rejected" data-id="${app.id}">✎ Update Rejection Note</button>
+            <span class="muted" style="font-size: 12px; margin-left: auto;">Reviewed ${reviewedTime || createdTime}</span>
+          </div>
+        </div>
+      ` : `
+        <div class="review-actions-box review-box-pending">
+          <label for="admin-note-${app.id}" class="app-detail-label">Administrator Decision Note</label>
+          <input id="admin-note-${app.id}" placeholder="Enter approval notes or specific rejection reasons..." style="margin-top: 4px; margin-bottom: 8px;" value="${app.admin_note || ''}">
+          <div class="review-btn-row">
+            <button type="button" class="btn-pill btn-approve admin-btn-approve" data-id="${app.id}">✓ Approve Recycler</button>
+            <button type="button" class="btn-pill btn-reject admin-btn-reject" data-id="${app.id}">✕ Reject Application</button>
+            <span class="muted" style="font-size: 12px; margin-left: auto;">Submitted ${createdTime}</span>
+          </div>
+        </div>
+      `)}
     `;
 
-    card.querySelector('.admin-btn-approve').addEventListener('click', () => {
-      const note = card.querySelector(`#admin-note-${app.id}`).value.trim();
-      handleAdminAppReview(app.id, 'approved', note);
-    });
+    const noteInput = card.querySelector(`#admin-note-${app.id}`);
 
-    card.querySelector('.admin-btn-reject').addEventListener('click', () => {
-      const note = card.querySelector(`#admin-note-${app.id}`).value.trim();
-      handleAdminAppReview(app.id, 'rejected', note);
-    });
+    const approveBtn = card.querySelector('.admin-btn-approve');
+    if (approveBtn) {
+      approveBtn.addEventListener('click', () => {
+        const note = noteInput ? noteInput.value.trim() : '';
+        handleAdminAppReview(app.id, 'approved', note || 'Verified by administrator.');
+      });
+    }
+
+    const rejectBtn = card.querySelector('.admin-btn-reject');
+    if (rejectBtn) {
+      rejectBtn.addEventListener('click', () => {
+        const note = noteInput ? noteInput.value.trim() : '';
+        handleAdminAppReview(app.id, 'rejected', note || 'Verification requirements not met.');
+      });
+    }
+
+    const suspendBtn = card.querySelector('.admin-btn-suspend');
+    if (suspendBtn) {
+      suspendBtn.addEventListener('click', () => {
+        const note = noteInput ? noteInput.value.trim() : '';
+        handleAdminAppReview(app.id, 'suspended', note || 'Account temporarily suspended by administrator.');
+      });
+    }
+
+    const revokeBtn = card.querySelector('.admin-btn-revoke');
+    if (revokeBtn) {
+      revokeBtn.addEventListener('click', () => {
+        const note = noteInput ? noteInput.value.trim() : '';
+        handleAdminAppReview(app.id, 'revoked', note || 'Verification credentials revoked by administrator.');
+      });
+    }
+
+    const saveNoteBtn = card.querySelector('.admin-btn-save-note');
+    if (saveNoteBtn) {
+      saveNoteBtn.addEventListener('click', () => {
+        const note = noteInput ? noteInput.value.trim() : '';
+        handleAdminAppReview(app.id, 'approved', note || 'Notes updated by administrator.');
+      });
+    }
+
+    const saveNoteRejectBtn = card.querySelector('.admin-btn-save-note-rejected');
+    if (saveNoteRejectBtn) {
+      saveNoteRejectBtn.addEventListener('click', () => {
+        const note = noteInput ? noteInput.value.trim() : '';
+        handleAdminAppReview(app.id, 'rejected', note || 'Rejection notes updated by administrator.');
+      });
+    }
 
     container.appendChild(card);
   });
@@ -2498,7 +2578,11 @@ function renderAdminApplications() {
 async function handleAdminAppReview(applicationId, decision, note) {
   try {
     const res = await api('/api/admin/review-application', { applicationId, decision, note });
-    notice(`Application ${decision === 'approved' ? 'approved' : 'rejected'} successfully.`);
+    let actionLabel = 'approved';
+    if (decision === 'suspended') actionLabel = 'suspended';
+    else if (decision === 'revoked') actionLabel = 'revoked';
+    else if (decision === 'rejected') actionLabel = 'rejected';
+    notice(`Recycler application ${actionLabel} successfully.`);
     await loadAdminApplications();
   } catch (err) {
     error(err.message || 'Could not update application review.');

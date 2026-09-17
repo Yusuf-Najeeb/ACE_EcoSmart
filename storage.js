@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 
 export function openStorage(dbPath) {
   if (dbPath !== ':memory:') mkdirSync(dirname(dbPath), { recursive: true });
@@ -302,6 +302,7 @@ export function openStorage(dbPath) {
   for (const m of pilotMaterials) {
     db.prepare('INSERT OR IGNORE INTO supported_materials (id, name, active, recyclable, guidance, created_at) VALUES (?, ?, 1, 1, ?, ?)').run(m.id, m.name, m.guidance, now);
   }
+
   return db;
 }
 

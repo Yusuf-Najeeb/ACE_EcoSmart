@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { randomBytes, randomUUID, createHash, randomInt, createHmac, timingSafeEqual } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AppError, createEmailProvider } from './email.js';
@@ -8,6 +8,17 @@ import { openStorage, verificationKey } from './storage.js';
 import { analyzeWasteImage } from './vision.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
+
+export function getDatabasePath() {
+  if (process.env.DB_PATH) return resolve(process.env.DB_PATH);
+  // If Railway persistent volume is mounted at /data
+  try {
+    if (existsSync('/data') && !existsSync(resolve(root, 'data'))) {
+      return '/data/ecosmart.sqlite';
+    }
+  } catch {}
+  return resolve(root, 'data/ecosmart.sqlite');
+}
 const hash = value => createHash('sha256').update(value).digest('hex');
 const token = () => randomBytes(32).toString('hex');
 export function sameArea(a, b) {
@@ -69,7 +80,7 @@ export function validate(input) {
   return { role: input.role, name, area, email };
 }
 
-export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), provider = createEmailProvider(), origin = (process.env.APP_ORIGIN || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000')).replace(/\/+$/, ''), demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now, visionAnalyzer = analyzeWasteImage } = {}) {
+export function createApp({ dbPath = getDatabasePath(), provider = createEmailProvider(), origin = (process.env.APP_ORIGIN || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000')).replace(/\/+$/, ''), demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now, visionAnalyzer = analyzeWasteImage } = {}) {
   const db = openStorage(dbPath);
   const key = verificationKey(dbPath);
   const codeHash = (id, code) => createHmac('sha256', key).update(`${id}:${code}`).digest('hex');
@@ -1309,25 +1320,32 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
           const decision = input.decision;
           const note = typeof input.note === 'string' ? input.note.trim() : '';
           if (!applicationId) throw new AppError(400, 'Application ID is required.');
-          if (!['approved', 'rejected'].includes(decision)) throw new AppError(400, 'Decision must be approved or rejected.');
+          if (!['approved', 'rejected', 'suspended', 'revoked'].includes(decision)) throw new AppError(400, 'Decision must be approved, rejected, suspended, or revoked.');
           
           const app = db.prepare('SELECT * FROM recycler_applications WHERE id=?').get(applicationId);
           if (!app) throw new AppError(404, 'Application not found.');
           if (app.user_id === user.id) throw new AppError(403, 'Administrators cannot review their own application.');
 
+          const isApproval = decision === 'approved';
+          const dbStatus = isApproval ? 'approved' : 'rejected';
+          const userAccountStatus = isApproval ? 'active' : (decision === 'suspended' ? 'suspended' : 'rejected');
+          const defaultNote = isApproval 
+            ? 'Verified by administrator.' 
+            : (decision === 'suspended' ? 'Account temporarily suspended by administrator.' : (decision === 'revoked' ? 'Verification revoked by administrator.' : 'Verification requirements not met.'));
+
           const time = now();
           db.exec('BEGIN IMMEDIATE');
           try {
             db.prepare('UPDATE recycler_applications SET status=?, admin_user_id=?, admin_note=?, reviewed_at=?, updated_at=? WHERE id=?').run(
-              decision,
+              dbStatus,
               user.id,
-              note || (decision === 'approved' ? 'Verified by administrator.' : 'Verification requirements not met.'),
+              note || defaultNote,
               time,
               time,
               applicationId
             );
             db.prepare('UPDATE users SET account_status=?, updated_at=? WHERE id=?').run(
-              decision === 'approved' ? 'active' : 'rejected',
+              userAccountStatus,
               time,
               app.user_id
             );
