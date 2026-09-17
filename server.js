@@ -1733,7 +1733,28 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const port = Number(process.env.PORT || 3000);
-  const { server } = createApp();
+  const { server, db } = createApp();
+
+  // Bootstrap initial administrators for live testing and operations
+  const adminEmails = ['yusnaj21@gmail.com', 'yusnaj21@yahoo.com'];
+  if (process.env.ADMIN_EMAIL) {
+    adminEmails.unshift(process.env.ADMIN_EMAIL.trim().toLowerCase());
+  }
+  const now = Date.now();
+  for (const adminEmail of adminEmails) {
+    const existing = db.prepare('SELECT id, role FROM users WHERE email=?').get(adminEmail);
+    if (!existing) {
+      db.prepare(`
+        INSERT INTO users (id, role, name, email, area, verification_status, account_status, created_at, updated_at)
+        VALUES (?, 'administrator', 'Najeeb Yusuf (Admin)', ?, 'Headquarters, Lagos', 'verified', 'active', ?, ?)
+      `).run(randomUUID(), adminEmail, now, now);
+      console.log(`[EcoSmart] Bootstrapped administrator account: ${adminEmail}`);
+    } else if (existing.role !== 'administrator') {
+      db.prepare("UPDATE users SET role='administrator', updated_at=? WHERE email=?").run(now, adminEmail);
+      console.log(`[EcoSmart] Promoted user to administrator: ${adminEmail}`);
+    }
+  }
+
   const host = process.env.HOST || '0.0.0.0';
   server.listen(port, host, () => console.log(`EcoSmart running at http://${host}:${port}`));
 }
