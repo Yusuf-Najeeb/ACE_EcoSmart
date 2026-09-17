@@ -48,7 +48,7 @@ export function validate(input) {
   return { role: input.role, name, area, email };
 }
 
-export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), provider = createEmailProvider(), origin = process.env.APP_ORIGIN || 'http://localhost:3000', demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now, visionAnalyzer = analyzeWasteImage } = {}) {
+export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), provider = createEmailProvider(), origin = (process.env.APP_ORIGIN || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000')).replace(/\/+$/, ''), demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now, visionAnalyzer = analyzeWasteImage } = {}) {
   const db = openStorage(dbPath);
   const key = verificationKey(dbPath);
   const codeHash = (id, code) => createHmac('sha256', key).update(`${id}:${code}`).digest('hex');
@@ -1713,5 +1713,6 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const port = Number(process.env.PORT || 3000);
   const { server } = createApp();
-  server.listen(port, '127.0.0.1', () => console.log(`EcoSmart running at http://localhost:${port}`));
+  const host = process.env.HOST || '0.0.0.0';
+  server.listen(port, host, () => console.log(`EcoSmart running at http://${host}:${port}`));
 }
