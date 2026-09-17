@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EcoSmart Open Marketplace User Flows</title>
+  <style>
+    :root { color-scheme: light; --ink:#17312a; --muted:#52675f; --paper:#fbfdfb; --line:#dce7e0; --green:#16714e; --mint:#e9f6ef; --blue:#eaf4f6; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f1f6f3; color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:900px; margin:40px auto; padding:40px; background:var(--paper); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 30px rgba(28,67,49,.08); }
+    h1,h2 { line-height:1.2; } h1 { margin:0 0 8px; font-size:2rem; } h2 { margin-top:36px; padding-top:16px; border-top:1px solid var(--line); font-size:1.4rem; }
+    .intro { color:var(--muted); margin-top:0; } .goal { margin:18px 0; padding:14px 16px; border-left:4px solid var(--green); background:var(--mint); border-radius:0 8px 8px 0; }
+    ol { padding-left:1.55rem; } li { margin:0 0 12px; } ul { margin:8px 0 0; } code { display:block; padding:14px 16px; background:var(--blue); border-radius:8px; white-space:normal; font-size:.94rem; }
+    strong { color:#0c593b; } @media (max-width:640px) { main { margin:0; padding:24px 20px; border-radius:0; } h1 { font-size:1.65rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>EcoSmart Open Marketplace User Flows</h1>
+    <p class="intro">The waste generator creates a listing for one selected recycler. The recycler manages their profile and responds to that request. A completed transaction requires both flows: the recycler inspects and funds a final offer, then the generator accepts it.</p>
+
+    <h2>Waste generator flow</h2>
+    <p class="goal"><strong>Main goal:</strong> Find a verified recycler for a supported material, agree a handover, accept the recycler’s funded final offer, and receive payment.</p>
+    <ol>
+      <li>The generator opens EcoSmart and selects <strong>Create generator account</strong>.</li><li>The generator enters their full name and email address.</li><li>EcoSmart sends a one-time email code. The generator enters the code to verify the email address.</li><li>The generator enters their area or neighbourhood.</li><li>The generator selects <strong>Check my waste</strong>.</li><li>The generator scans an item, uploads a photo, or manually selects one supported material: cardboard, PET plastic bottles, aluminium, brass, or glass.</li><li>If EcoSmart cannot confidently match a scan or photo, it asks the generator to choose a supported material manually. If the item is outside the pilot catalogue, EcoSmart shows <strong>Not supported in this pilot</strong> and the flow ends for that item.</li><li>EcoSmart shows recyclability guidance and a recycling tip for the selected material.</li><li>EcoSmart shows verified recyclers that match the generator’s area/neighbourhood, selected material, and availability. Each recycler shows an estimated price and clearly labelled unit.</li><li>The generator selects one recycler and creates a listing with material, description or photo, quantity if known, location, and preferred pickup or drop-off arrangement.</li><li>The generator waits for the selected recycler’s response.</li><li>If the recycler declines, EcoSmart shows other matching recyclers. The generator may choose another recycler and resend the listing; EcoSmart does not automatically send it to every recycler.</li><li>If the recycler accepts, the generator sees the recycler’s approved contact details and confirms the practical pickup or drop-off arrangement.</li><li>The generator completes the agreed handover directly with the recycler, outside the app.</li><li>After inspection, EcoSmart shows the generator the recycler-recorded actual weight, funded final offer, and 24-hour expiry time.</li><li>The generator accepts the final offer, rejects it, or takes no action. Acceptance releases the funded amount; rejection makes no payment; no action expires after 24 hours.</li><li>The generator can view the time-stamped transaction record.</li>
+    </ol>
+
+    <h2>Recycler flow</h2>
+    <p class="goal"><strong>Main goal:</strong> Become verified, declare what materials to buy, receive relevant direct-supply requests, inspect material, and make a funded final offer.</p>
+    <ol>
+      <li>The recycler opens EcoSmart and selects <strong>Create recycler account</strong>.</li><li>The recycler enters their name, phone number, government ID, photo, recycler licence or registration details, area/neighbourhood, and contact details.</li><li>EcoSmart records the verification application. The recycler cannot receive listings or make offers until an EcoSmart administrator approves the profile.</li><li>Once approved, the recycler selects each pilot material they accept: cardboard, PET plastic bottles, aluminium, brass, and/or glass.</li><li>For each selected material, the recycler sets a non-binding estimated buying price and chooses its unit: per kilogram, per item, or per bag.</li><li>The recycler sets their availability to <strong>Available</strong> or <strong>Unavailable</strong>. Only available recyclers can appear in matching results.</li><li>EcoSmart shows the recycler a request only when it matches their area/neighbourhood, accepted material, and availability.</li><li>The recycler reviews the material, photo or description, quantity if supplied, location, and preferred pickup or drop-off arrangement.</li><li>The recycler accepts the request—revealing approved contact details and enabling handover coordination—or declines it. A declined request is not automatically sent to all recyclers.</li><li>For an accepted request, the recycler completes the agreed handover directly with the generator, outside the app.</li><li>The recycler inspects and weighs the material and records the actual weight.</li><li>The recycler enters the final amount, funds that exact amount in the wallet/payment provider, then sends the final offer. An unfunded final offer cannot be sent.</li><li>EcoSmart holds the funded amount while the generator has up to 24 hours to respond.</li><li>If the generator accepts, EcoSmart releases the amount and marks the transaction <strong>Completed</strong>. No commission is deducted during the pilot.</li><li>If the generator rejects or does not respond within 24 hours, no payout is made and the transaction is <strong>Rejected</strong> or <strong>Expired</strong>.</li><li>The recycler can view the time-stamped transaction record.</li>
+    </ol>
+
+    <h2>Shared transaction states</h2>
+    <code>Draft → Sent to recycler → Accepted → Handover arranged → Inspected → Funded final offer → Generator accepted → Completed</code>
+    <p>Alternative outcomes: <strong>Recycler declined</strong> → generator chooses another match; <strong>Generator rejected</strong> → Rejected; <strong>No generator response for 24 hours</strong> → Expired.</p>
+  </main>
+</body>
+</html>

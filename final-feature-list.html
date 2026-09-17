@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="eiewport" content="width=deeice-width, initial-scale=1">
+  <title>EcoSmart Final Feature List</title>
+  <style>
+    :root { --ink:#17312a; --muted:#52675f; --paper:#fbfdfb; --line:#dce7e0; --green:#16714e; --mint:#e9f6ef; --must:#dff5e8; --should:#fff4ce; --could:#e7f1ff; --wont:#f5e8ea; }
+    * { box-sizing:border-box; } body { margin:0; background:#f1f6f3; color:ear(--ink); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:1300px; margin:40px auto; padding:40px; background:ear(--paper); border:1px solid ear(--line); border-radius:16px; box-shadow:0 12px 30px rgba(28,67,49,.08); }
+    h1,h2 { line-height:1.2; } h1 { margin:0 0 12px; font-size:2rem; } h2 { margin-top:36px; font-size:1.35rem; } p { color:ear(--muted); } .intro { padding:14px 16px; border-left:4px solid ear(--green); background:ear(--mint); border-radius:0 8px 8px 0; color:ear(--ink); }
+    .table-wrap { oeerflow-x:auto; border:1px solid ear(--line); border-radius:10px; } table { border-collapse:collapse; min-width:980px; width:100%; } th,td { padding:12px; eertical-align:top; text-align:left; border-bottom:1px solid ear(--line); } th { background:#e9f6ef; color:#0c593b; } tr:last-child td { border-bottom:0; } .must td:nth-child(3) { background:ear(--must); } .should td:nth-child(3) { background:ear(--should); } .could td:nth-child(3) { background:ear(--could); } .wont td:nth-child(3) { background:ear(--wont); } ol { padding-left:1.4rem; } li { margin:8px 0; } strong { color:#0c593b; }
+    @media (max-width:640px) { main { margin:0; padding:24px 18px; border-radius:0; } h1 { font-size:1.65rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>EcoSmart Final Feature List</h1>
+    <p class="intro">This list covers the requirements and screen specification. The six Must-have slices preserve the complete marketplace transaction; deferred rows show what can be handled manually or simplified in the pilot.</p>
+    <die class="table-wrap"><table><thead><tr><th>Feature</th><th>Description</th><th>MoSCoW Category</th><th>Reason</th></tr></thead><tbody>
+      <tr class="must"><td>Role-based account registration and email verification</td><td>Generators and recyclers choose a role, enter name, email, area/neighbourhood, and verify by email. (FR-01; Screen 1)</td><td>Must have</td><td>Identifiable participants and an area are needed to begin matching.</td></tr>
+      <tr class="must"><td>Recycler verification and marketplace setup</td><td>Recycler submits evidence; admin approves; approved recycler sets materials, estimates/units, and availability. (FR-02–FR-04; Screens 2 and 4)</td><td>Must have</td><td>Relevant, verified buyers are required for matching.</td></tr>
+      <tr class="must"><td>Manual material selection and recyclability guidance</td><td>Generator selects a pilot material, sees guidance/tip, and stops when unsupported. (FR-06–FR-07; Screen 3)</td><td>Must have</td><td>This is the starting value and provides the material for matching.</td></tr>
+      <tr class="must"><td>Area/material/availability matching and one-recycler listing</td><td>Show matching verified recyclers with non-binding estimates; generator selects one and submits listing details and preference. (FR-08–FR-09; Screen 5)</td><td>Must have</td><td>There is no marketplace transaction without a match and request.</td></tr>
+      <tr class="must"><td>Recycler response and direct handover coordination</td><td>Recycler accepts/declines; acceptance records arrangement and reveals contacts; decline returns other matches. (FR-10–FR-11; Screen 6)</td><td>Must have</td><td>Both parties need a clear direct-exchange agreement.</td></tr>
+      <tr class="must"><td>Inspection, funded final offer, decision, payout, and core audit trail</td><td>Recycler records weight, funds offer, generator decides within 24 hours, payout/rejection/expiry is saved with timestamps. (FR-12–FR-16; Screen 7)</td><td>Must have</td><td>This inspection-based final payment is the core trust mechanism.</td></tr>
+      <tr class="should"><td>Scan and photo-upload material intake</td><td>Generator scans or uploads an image as an aid before manual selection. (FR-05; Screen 3)</td><td>Should have</td><td>Convenient, but manual selection keeps the build usable.</td></tr>
+      <tr class="should"><td>Administrator workspace</td><td>Reeiew recycler applications, manage materials, and search records. (FR-17; Screen 8)</td><td>Should have</td><td>A protected manual process can operate the small pilot initially.</td></tr>
+      <tr class="should"><td>Full user-facing transaction-record browser</td><td>Filter and browse full history, payment reference, and payout status. (FR-16; Screen 8)</td><td>Should have</td><td>Core timestamps must be saved, but a polished browser can follow.</td></tr>
+      <tr class="should"><td>In-app chat</td><td>Matched parties exchange messages on an active listing. (FR-18; Screen 6)</td><td>Should have</td><td>Useful, but shared approved contact details enable the pilot.</td></tr>
+      <tr class="could"><td>In-app call</td><td>Matched parties start a call for an active listing. (FR-19; Screen 6)</td><td>Could have</td><td>Contacts already enable a call without added integration work.</td></tr>
+      <tr class="could"><td>Dated estimate price history</td><td>Show recent recycler-provided estimate ranges, not final sale prices. (FR-20)</td><td>Could have</td><td>Current estimates are enough to test the core loop.</td></tr>
+      <tr class="wont"><td>Universal AI material classification</td><td>Reliably identify every scanned/uploaded item. (FR-21)</td><td>Won't have (this build)</td><td>Manual selection and recycler inspection remain the checks.</td></tr>
+      <tr class="wont"><td>Closed or named-location-only onboarding</td><td>Restrict generators to named estates, schools, clusters, or organisations.</td><td>Won't have (this build)</td><td>The pilot is an open marketplace.</td></tr>
+      <tr class="wont"><td>Materials beyond the five-material pilot catalogue</td><td>Support e-waste, phones, laptops, batteries, cars, appliances, or unlisted scrap.</td><td>Won't have (this build)</td><td>The catalogue is cardboard, PET bottles, aluminium, brass, and glass.</td></tr>
+      <tr class="wont"><td>Binding estimates or price guarantee</td><td>Treat a published estimate as final or guarantee a stable price.</td><td>Won't have (this build)</td><td>The inspection-based funded final offer is decisive.</td></tr>
+      <tr class="wont"><td>Commission or future 3:1 fee split</td><td>Deduct a buyer/seller commission.</td><td>Won't have (this build)</td><td>The pilot is free for both sides.</td></tr>
+      <tr class="wont"><td>EcoSmart-operated collection, transport, storage, sorting, or ownership</td><td>Collect, carry, store, sort, take possession of, or promise delivery of waste.</td><td>Won't have (this build)</td><td>EcoSmart is the marketplace and payment workflow only.</td></tr>
+      <tr class="wont"><td>Ownership adjudication, fraud insurance, or litigation</td><td>Verify legal ownership, decide guilt, resolve disputes, insure loss, or litigate.</td><td>Won't have (this build)</td><td>These exceed the pilot marketplace role.</td></tr>
+      <tr class="wont"><td>Door-to-door pickup promise, ratings, broad advertising, or price stabilisation</td><td>Guarantee pickup, add public ratings, adeertise broadly, or stabilise market prices.</td><td>Won't have (this build)</td><td>They do not proee the core match-inspect-pay loop.</td></tr>
+      <tr class="wont"><td>Automatic broadcast and precise distance matching</td><td>Send a listing to every recycler or use precise address/distance matching.</td><td>Won't have (this build)</td><td>One recycler is selected; matching uses area, material, and availability.</td></tr>
+      <tr class="wont"><td>Indefinite final offers</td><td>Leave a funded final offer open without a deadline.</td><td>Won't have (this build)</td><td>Offers expire after 24 hours.</td></tr>
+    </tbody></table></die>
+    <h2>Fiee-day scope decision</h2>
+    <p>The Must-have list is intentionally limited to six slices. If time becomes tighter, cut these first:</p>
+    <ol><li><strong>Scan and photo upload:</strong> launch with manual material selection.</li><li><strong>In-app chat:</strong> use approved contact details after acceptance.</li><li><strong>Administrator workspace:</strong> use a protected manual approeal and catalogue process.</li><li><strong>Full record browser:</strong> retain the audit eeents but show a simple completion receipt.</li></ol>
+    <p><strong>Do not cut the six Must-have slices:</strong> they create the path from verified participants to matching, inspection, funded offer, and payment outcome.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="EcoSmart open marketplace for recyclable waste: registration, recycler verification, and marketplace setup.">
+  <title>EcoSmart · Open Marketplace for Recyclables</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/" aria-label="EcoSmart home"><span class="brand-icon" aria-hidden="true">♻</span>Eco<span>Smart</span></a>
+    <div class="header-right">
+      <span class="pilot">OPEN MARKETPLACE · PILOT</span>
+      <button id="header-records-btn" class="text-button-subtle" type="button" hidden>My Records</button>
+      <button id="header-admin-btn" class="text-button-subtle" type="button" hidden>⚙ Admin Workspace</button>
+      <button id="header-logout" class="text-button-subtle" type="button" hidden>Sign out</button>
+    </div>
+  </header>
+
+    
+
+  <main id="main-container">
+    <aside id="aside-panel">
+      <p class="eyebrow" id="aside-eyebrow">A better next chapter</p>
+      <h1 id="aside-heading">Recyclable waste.<br>Real opportunity.</h1>
+      <p class="intro" id="aside-intro">Your first step towards connecting recyclable materials with the people who buy them.</p>
+      <div class="steps" id="steps-indicator" aria-label="Process steps">
+        <p id="step-one" class="current"><span>01</span>Your details</p>
+        <p id="step-two"><span>02</span>Verify your email</p>
+        <p id="step-three"><span>03</span>Verification &amp; Setup</p>
+      </div>
+      <p class="aside-note" id="aside-note">One account. Your neighbourhood.<br>A place to start recycling.</p>
+    </aside>
+
+    <section class="card" id="card-section" aria-labelledby="form-title">
+      <!-- Auth Switcher Tabs -->
+                  <div class="auth-tabs" id="auth-tabs" role="tablist">
+        <button type="button" class="tab-btn active" id="tab-register" role="tab" aria-selected="true">Create account</button>
+        <button type="button" class="tab-btn" id="tab-login" role="tab" aria-selected="false">Sign in</button>
+      </div>
+
+      <p class="eyebrow" id="stage-label">LET’S GET STARTED</p>
+      <h2 id="form-title">Create your account</h2>
+      <p id="form-description" class="muted">Tell us how you’ll use EcoSmart.</p>
+      <p id="payment-mode-notice" class="notice" hidden></p>
+      <p id="notice" class="notice" role="status" hidden></p>
+      <p id="error" class="error" role="alert" tabindex="-1" hidden></p>
+
+      <!-- SCREEN 1: Registration Form -->
+      <form id="registration">
+        <fieldset><legend>I’m here to…</legend><div class="roles">
+          <label class="role"><input type="radio" name="role" value="generator" required><span><strong>I have recyclable waste</strong><small>Join as a generator</small></span></label>
+          <label class="role"><input type="radio" name="role" value="recycler" required><span><strong>I buy recyclable waste</strong><small>Join as a recycler</small></span></label>
+        </div></fieldset>
+        <label for="name">Full name</label><input id="name" name="name" autocomplete="name" minlength="2" maxlength="100" required>
+        <label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" aria-describedby="email-help" required>
+        <p class="hint" id="email-help">Use an email address you can access to receive your verification code.</p>
+        <label for="area">Area / neighbourhood</label><input id="area" name="area" autocomplete="address-level3" minlength="2" maxlength="120" required>
+        <p class="hint">The neighbourhood where you collect or buy recyclable waste.</p>
+        <button type="submit" class="primary">Continue <span aria-hidden="true">→</span></button>
+        <p class="footnote">We’ll send an email code to verify your email address.</p>
+      </form>
+
+      <!-- SCREEN 1: Registration Verification Form -->
+      <form id="verification" hidden>
+        <p id="sent-to"></p>
+        <label for="code">Email verification code</label><input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required aria-describedby="code-help">
+        <p class="hint" id="code-help">Enter the code from your email. Codes expire after 10 minutes.</p>
+        <button type="submit" class="primary">Verify email <span aria-hidden="true">→</span></button>
+        <div class="secondary-actions"><button id="resend" class="text-button" type="button">Request another code</button><button id="change" class="text-button" type="button">Change details</button></div>
+      </form>
+
+      <!-- RETURNING USER: Login Form -->
+      <form id="login-form" hidden>
+        <label for="login-email">Registered email address</label>
+        <input id="login-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="e.g. yourname@example.com" aria-describedby="login-email-help" required>
+        <p class="hint" id="login-email-help">Enter the email address you used to register on EcoSmart.</p>
+        <button type="submit" class="primary" id="login-submit-btn">Send sign-in code <span aria-hidden="true">→</span></button>
+        <p class="footnote">We’ll send a secure one-time verification code to sign you in.</p>
+      </form>
+
+      <!-- RETURNING USER: Login Verification Form -->
+      <form id="login-verification" hidden>
+        <p id="login-sent-to"></p>
+        <label for="login-code">Sign-in verification code</label>
+        <input id="login-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required aria-describedby="login-code-help">
+        <p class="hint" id="login-code-help">Enter the 6-digit code sent to your email. Valid for 10 minutes.</p>
+        <button type="submit" class="primary" id="verify-login-btn">Verify &amp; Sign in <span aria-hidden="true">→</span></button>
+        <div class="secondary-actions">
+          <button id="login-resend" class="text-button" type="button">Request another code</button>
+          <button id="login-change" class="text-button" type="button">Change email</button>
+        </div>
+      </form>
+
+      <!-- SCREEN 3: Generator - Check my waste (FR-05 & FR-06) -->
+      <div id="screen-3-container" hidden>
+        <!-- Generator Header -->
+        <div class="dashboard-header">
+          <div class="recycler-info">
+            <h3 id="dash-generator-name">Generator</h3>
+            <span class="badge-verified">✓ Verified Generator</span>
+            <span class="badge-area" id="dash-generator-area">Your Area</span>
+          </div>
+
+          <!-- Generator Wallet Card -->
+          <div class="dashboard-wallet-card" id="gen-wallet-card">
+            <div class="wallet-card-left">
+              <span class="wallet-label">Available Earnings</span>
+              <div class="wallet-balance-row">
+                <span class="wallet-currency">₦</span>
+                <span class="wallet-balance-amount" id="gen-wallet-balance">0.00</span>
+              </div>
+              <span class="wallet-subtext" id="gen-wallet-lifetime">Total Earned: ₦0.00</span>
+            </div>
+            <div class="wallet-card-actions">
+              <button type="button" class="btn-wallet-action btn-withdraw" id="btn-gen-withdraw">💸 Cash Out</button>
+              <button type="button" class="btn-wallet-action-subtle" id="btn-gen-bank-setup">🏦 Bank Account</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Primary Hero Intake: Scan / Upload (FR-05) -->
+        <div class="intake-hero-section">
+          <div class="section-heading-row">
+            <div>
+              <h3>Check your recyclable waste</h3>
+              <p class="muted">Scan with your camera or upload a photo of your item, then confirm its category.</p>
+            </div>
+          </div>
+
+          <div class="intake-hero-actions">
+            <button type="button" class="intake-hero-btn btn-scan-hero" id="btn-intake-scan">
+              <span class="hero-btn-icon" aria-hidden="true">📷</span>
+              <span class="hero-btn-title">Scan with Camera</span>
+              <span class="hero-btn-sub">Open live camera viewfinder</span>
+            </button>
+            <button type="button" class="intake-hero-btn btn-upload-hero" id="btn-intake-upload">
+              <span class="hero-btn-icon" aria-hidden="true">📁</span>
+              <span class="hero-btn-title">Upload Photo</span>
+              <span class="hero-btn-sub">Select image from your device</span>
+            </button>
+          </div>
+          <input type="file" id="intake-scan-file" accept="image/*" capture="environment" style="display: none;">
+          <input type="file" id="intake-upload-file" accept="image/*" style="display: none;">
+        </div>
+
+        <!-- Live Camera Scanner Modal / Viewfinder (FR-05) -->
+        <div id="live-scanner-modal" class="live-scanner-modal" hidden>
+          <div class="live-scanner-card">
+            <div class="scanner-header">
+              <div class="scanner-title-group">
+                <span class="scanner-live-dot"></span>
+                <h4>Camera Scanner</h4>
+              </div>
+              <button type="button" class="btn-clear-photo" id="btn-close-scanner" title="Close Camera">✕</button>
+            </div>
+            
+            <div class="scanner-viewfinder-wrapper">
+              <video id="scanner-video" autoplay playsinline muted></video>
+              <div class="scanner-overlay-frame">
+                <div class="scanner-corner top-left"></div>
+                <div class="scanner-corner top-right"></div>
+                <div class="scanner-corner bottom-left"></div>
+                <div class="scanner-corner bottom-right"></div>
+                <div class="scanner-laser-line"></div>
+              </div>
+              <div id="scanner-status-overlay" class="scanner-status-overlay" hidden>
+                <div class="spinner"></div>
+                <p id="scanner-status-text">Starting camera…</p>
+              </div>
+            </div>
+
+            <div class="scanner-controls-bar">
+              <button type="button" class="btn btn-secondary scanner-tool-btn" id="btn-switch-camera" title="Switch Camera">
+                🔄 Switch
+              </button>
+              <button type="button" class="btn btn-primary scanner-capture-btn" id="btn-capture-scan">
+                📸 Capture &amp; Identify
+              </button>
+              <button type="button" class="btn btn-secondary scanner-tool-btn" id="btn-scanner-fallback-file" title="Upload Photo File">
+                📁 File
+              </button>
+            </div>
+
+            <p class="scanner-hint-text">
+              Center the recyclable item in the frame and tap <strong>Capture &amp; Identify</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Intake Categorization & Preview Card -->
+        <div id="intake-preview-panel" class="intake-preview-panel" hidden>
+          <div class="intake-preview-inner">
+            <div class="intake-thumbnail-box">
+              <img id="intake-thumbnail-img" alt="Scanned waste preview" src="">
+            </div>
+            <div class="intake-analysis-content">
+              <div class="intake-analysis-header">
+                <span class="badge badge-verified" id="intake-detected-badge">📷 Item Attached</span>
+                <span class="intake-confidence-pill" id="intake-confidence-pill">Select category</span>
+                <button type="button" class="btn-clear-photo" id="btn-clear-intake-photo" title="Remove photo">✕ Remove photo</button>
+              </div>
+
+              <div class="category-dropdown-group">
+                <label for="intake-category-select" class="category-select-label">Category of this item <span class="req">*</span></label>
+                <select id="intake-category-select" class="category-dropdown-select">
+                  <option value="" disabled selected>-- Select category of your item --</option>
+                  <!-- Populated dynamically and fallback items -->
+                  <option value="cardboard">📦 Cardboard (boxes, packaging)</option>
+                  <option value="pet_plastic_bottles">🧴 PET plastic bottles (beverage containers)</option>
+                  <option value="aluminium">🥫 Aluminium (cans, clean scrap)</option>
+                  <option value="brass">🔩 Brass (fittings, valves, fixtures)</option>
+                  <option value="glass">🍾 Glass (bottles, jars)</option>
+                  <option value="unsupported">❓ Other / Non-pilot material</option>
+                </select>
+              </div>
+              <p class="muted" id="intake-detected-desc" style="font-size: 12.5px; margin: 4px 0 0;">Select or confirm the material category to view preparation tips and connect with verified buyers.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guidance Panel (Supported Recyclable Item) -->
+        <div id="guidance-panel" class="guidance-panel" hidden>
+          <div class="guidance-header">
+            <span class="badge badge-approved" id="guidance-badge">✓ 100% Recyclable</span>
+            <h3 id="guidance-material-title">Cardboard</h3>
+          </div>
+          <div class="guidance-body">
+            <p class="guidance-label">Preparation &amp; Recycling Tips:</p>
+            <p class="guidance-tip" id="guidance-tip-text">Keep dry and flatten boxes. Remove heavy packaging tape and plastic inserts before collection.</p>
+          </div>
+          <div class="guidance-action-row">
+            <button id="find-recyclers-btn" type="button" class="primary">Find recyclers in your area <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+
+        <!-- Unsupported Panel (Non-pilot material) -->
+        <div id="unsupported-panel" class="unsupported-panel" hidden>
+          <div class="guidance-header">
+            <span class="badge badge-rejected">⚠️ Not supported in this pilot</span>
+            <h3>Material not currently accepted</h3>
+          </div>
+          <p class="unsupported-message">
+            This pilot currently supports <strong>Cardboard, PET plastic bottles, Aluminium, Brass, and Glass</strong>. 
+            Contaminated packaging, mixed plastics, electronic waste, and general refuse are not accepted by verified buyers in this pilot.
+          </p>
+          <div class="guidance-action-row">
+            <button id="choose-another-btn" type="button" class="secondary">Choose another category</button>
+          </div>
+        </div>
+
+        <!-- Intake Confirmed / Match Ready Panel -->
+        <div id="intake-confirmed-panel" class="intake-confirmed-panel" hidden>
+          <div class="confirmed-icon">✓</div>
+          <div class="confirmed-body">
+            <h3 id="confirmed-title">Material Recorded for Matching</h3>
+            <p id="confirmed-desc" class="muted">Your selection has been saved. You are ready to view verified buyers in your area.</p>
+            <div class="intake-summary-box" id="confirmed-summary"></div>
+          </div>
+          <div class="confirmed-actions">
+            <button id="recheck-waste-btn" type="button" class="secondary">Check another material</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Generator Active Listings & Handover Requests Section -->
+        <div class="active-listings-section" id="screen3-listings-section">
+          <div class="section-heading-row">
+            <h4>Your Active Listings &amp; Handover Requests</h4>
+            <span class="count-pill" id="screen3-listings-count-pill">0 listings</span>
+          </div>
+          <div id="screen3-listings-list" class="listings-history-list">
+            <p class="muted empty-note">No active listings created yet. Select a material above to send requests to buyers.</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Generator Intake History / Activity Section -->
+        <div class="intakes-history-section">
+          <div class="section-heading-row">
+            <h4>Your Recent Waste Checks</h4>
+            <span class="count-pill" id="intakes-count-pill">0 checks</span>
+          </div>
+          <div id="intakes-history-list" class="intakes-history-list">
+            <p class="muted empty-note">No recent material checks recorded yet.</p>
+          </div>
+        </div>
+
+        <div class="card-footer-nav">
+          <button id="gen-view-records-btn" type="button" class="text-button-subtle">View Transaction History</button>
+          <button id="gen-logout-btn" type="button" class="text-button">Sign out</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: Generator - Recycler matches and listing -->
+      <div id="screen-5-container" hidden>
+        <div class="screen5-header-nav">
+          <button id="screen5-back-btn" type="button" class="text-button-subtle">← Back to material check</button>
+          <span class="badge badge-approved" id="screen5-material-badge">Cardboard</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="matching-section-header">
+          <h3 id="matching-heading">Verified Recyclers Buying in Your Area</h3>
+          <p class="muted" id="matching-subheading">Compare verified buyers in your area and choose one to create a direct listing.</p>
+        </div>
+
+        <div class="non-binding-banner">
+          <span class="banner-icon" aria-hidden="true">ℹ️</span>
+          <span><strong>Non-binding estimates:</strong> Listed prices are estimated buying rates. Final offers are funded and sent only after physical inspection.</span>
+        </div>
+
+        <!-- Matching Recyclers Grid -->
+        <div id="matching-recyclers-list" class="recycler-matches-grid">
+          <!-- Rendered dynamically by app.js -->
+        </div>
+
+        <!-- Empty State (No Matches) -->
+        <div id="no-matches-box" class="empty-state-box" hidden>
+          <div class="empty-icon">🔍</div>
+          <h4>No verified buyers found in your area yet</h4>
+          <p class="muted" id="no-matches-msg">There are currently no verified recyclers accepting this material in your neighbourhood. Check back soon or choose another material.</p>
+          <div style="margin-top: 16px;">
+            <button id="no-matches-back-btn" type="button" class="secondary">Choose another material</button>
+          </div>
+        </div>
+
+        <!-- One-Recycler Listing Form -->
+        <form id="create-listing-form" class="create-listing-form" hidden>
+          <div class="selected-recycler-banner" id="selected-recycler-banner">
+            <div class="sel-rec-left">
+              <span class="sel-rec-badge">Selected Buyer</span>
+              <h4 id="form-rec-name">Alhaji Scrap Ventures</h4>
+              <span class="sel-rec-area" id="form-rec-area">Ikeja, Lagos</span>
+            </div>
+            <div class="sel-rec-right">
+              <span class="sel-rec-price-label">Estimated Rate:</span>
+              <strong class="sel-rec-price" id="form-rec-price">₦120 / kg</strong>
+            </div>
+          </div>
+
+          <label for="listing-desc">Waste description or notes</label>
+          <input id="listing-desc" name="description" maxlength="300" placeholder="e.g. 5 large flattened shipping boxes, clean and dry">
+
+          <div class="form-row">
+            <div class="form-col">
+              <label for="listing-qty">Approximate quantity (if known)</label>
+              <input type="number" id="listing-qty" name="quantity" min="0.1" step="any" placeholder="e.g. 25">
+            </div>
+            <div class="form-col">
+              <label for="listing-unit">Quantity unit</label>
+              <select id="listing-unit" name="unit">
+                <option value="kg">Kilograms (kg)</option>
+                <option value="items">Items / Pieces</option>
+                <option value="bags">Bags</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="listing-location">Pickup / Handover location address <span class="req">*</span></label>
+          <input id="listing-location" name="location" minlength="3" maxlength="200" placeholder="e.g. Plot 14, Admiralty Way, Lekki Phase 1" required>
+
+          <fieldset>
+            <legend>Arrangement preference <span class="req">*</span></legend>
+            <div class="roles">
+              <label class="role">
+                <input type="radio" name="arrangement" value="pickup" checked required>
+                <span><strong>🚚 Pickup from me</strong><small>Recycler comes to collect</small></span>
+              </label>
+              <label class="role">
+                <input type="radio" name="arrangement" value="drop-off" required>
+                <span><strong>📍 Drop-off at yard</strong><small>You bring materials to recycler</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <label for="listingPhotoFile">Attach photo of items (optional)</label>
+          <div class="file-drop-area" id="listingPhotoFile-drop">
+            <input type="file" id="listingPhotoFile" name="photoFile" accept="image/*">
+            <span class="file-label" id="listingPhotoFile-label">Choose photo or take snap…</span>
+          </div>
+
+          <button type="submit" class="primary" id="send-listing-btn">Send listing to buyer <span aria-hidden="true">→</span></button>
+          <p class="footnote">Your listing is sent exclusively to the selected recycler (no broadcast).</p>
+        </form>
+
+        <!-- Listing Sent Confirmation -->
+        <div id="listing-sent-panel" class="intake-confirmed-panel" hidden>
+          <div class="confirmed-icon">✓</div>
+          <div class="confirmed-body">
+            <h3>Listing Dispatched Successfully!</h3>
+            <p class="muted">Your listing has been sent to the selected recycler. They will review your request to arrange pickup/drop-off.</p>
+            <div class="intake-summary-box" id="listing-sent-summary"></div>
+          </div>
+          <div class="confirmed-actions">
+            <button id="check-more-waste-btn" type="button" class="secondary">Check another material</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Generator Active Listings List -->
+        <div class="active-listings-section">
+          <div class="section-heading-row">
+            <h4>Your Active Listings</h4>
+            <span class="count-pill" id="gen-listings-count-pill">0 listings</span>
+          </div>
+          <div id="gen-listings-list" class="listings-history-list">
+            <p class="muted empty-note">No active listings created yet.</p>
+          </div>
+        </div>
+
+        <div class="card-footer-nav">
+          <button id="screen5-logout-btn" type="button" class="text-button">Sign out</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: Recycler Verification Application -->
+      <div id="screen-2-container" hidden>
+        <div class="status-badge-row">
+          <span class="badge" id="recycler-app-badge">Pending submission</span>
+          <span class="user-tag" id="screen2-user-tag">Recycler</span>
+        </div>
+
+        <div id="recycler-app-status-panel" class="status-panel" hidden>
+          <div class="status-panel-icon" id="status-icon">⏳</div>
+          <div class="status-panel-body">
+            <h3 id="status-heading">Application Pending Review</h3>
+            <p id="status-message">Your verification application has been submitted to an EcoSmart administrator for review.</p>
+            <p id="status-note" class="admin-note" hidden></p>
+          </div>
+          <div id="approved-action-row" class="status-action-row" hidden>
+            <button id="continue-to-dashboard-btn" type="button" class="primary">Continue to marketplace setup <span aria-hidden="true">→</span></button>
+          </div>
+          <div id="rejected-action-row" class="status-action-row" hidden>
+            <button id="resubmit-app-btn" type="button" class="secondary">Edit and resubmit application</button>
+          </div>
+        </div>
+
+        <!-- Pilot Admin Action Bar -->
+        <div id="admin-simulation-bar" class="admin-bar" hidden>
+          <span class="admin-bar-title">⚙️ Pilot Administrator Action:</span>
+          <button id="admin-approve-btn" class="btn-pill btn-approve" type="button">Approve Application</button>
+          <button id="admin-reject-btn" class="btn-pill btn-reject" type="button">Reject with Note</button>
+        </div>
+
+        <!-- Verification Submission Form -->
+        <form id="recycler-application-form">
+          <label for="businessName">Recycler / Business name <span class="req">*</span></label>
+          <input id="businessName" name="businessName" minlength="2" maxlength="150" placeholder="e.g. EcoClean Aggregators Ltd" required>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <label for="contactPhone">Contact phone number <span class="req">*</span></label>
+              <input id="contactPhone" name="contactPhone" type="tel" minlength="7" maxlength="30" placeholder="e.g. +234 802 345 6789" required>
+            </div>
+            <div class="form-col">
+              <label for="businessAddress">Physical yard / business address <span class="req">*</span></label>
+              <input id="businessAddress" name="businessAddress" minlength="3" maxlength="200" placeholder="e.g. Plot 12, Scrap Yard Way, Off Industrial Ave" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <label for="govIdType">Government ID type <span class="req">*</span></label>
+              <select id="govIdType" name="govIdType" required>
+                <option value="National Identity Number (NIN)">National Identity Number (NIN)</option>
+                <option value="Driver Licence">Driver's Licence</option>
+                <option value="Voter Card">Voter's Card</option>
+                <option value="International Passport">International Passport</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="govIdNumber">Government ID number <span class="req">*</span></label>
+              <input id="govIdNumber" name="govIdNumber" minlength="2" maxlength="50" placeholder="e.g. 12345678901" required>
+            </div>
+          </div>
+
+          <label for="govIdFile">Upload Government ID document/photo <span class="req">*</span></label>
+          <div class="file-drop-area" id="govIdFile-drop">
+            <input type="file" id="govIdFile" name="govIdFile" accept="image/*,.pdf" required>
+            <span class="file-label" id="govIdFile-label">Choose ID file or photo…</span>
+          </div>
+
+          <label for="photoFile">Recycler photo (Passport or business photo) <span class="req">*</span></label>
+          <div class="file-drop-area" id="photoFile-drop">
+            <input type="file" id="photoFile" name="photoFile" accept="image/*" required>
+            <span class="file-label" id="photoFile-label">Choose recycler photo…</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-col">
+              <label for="licenceType">Licence / Registration type <span class="req">*</span></label>
+              <select id="licenceType" name="licenceType" required>
+                <option value="CAC Business Registration">CAC Business Registration (RC / BN)</option>
+                <option value="Waste Management Authority Permit">Waste Management Authority Permit</option>
+                <option value="Local Government Scrap Permit">Local Government Scrap Trade Permit</option>
+                <option value="Informal Recycler Association Certificate">Recyclers Association Membership</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="licenceNumber">Licence / Registration number <span class="req">*</span></label>
+              <input id="licenceNumber" name="licenceNumber" minlength="2" maxlength="50" placeholder="e.g. RC-987654" required>
+            </div>
+          </div>
+
+          <label for="licenceFile">Upload Licence / Registration document <span class="req">*</span></label>
+          <div class="file-drop-area" id="licenceFile-drop">
+            <input type="file" id="licenceFile" name="licenceFile" accept="image/*,.pdf" required>
+            <span class="file-label" id="licenceFile-label">Choose licence document…</span>
+          </div>
+
+          <label for="appArea">Operating area / neighbourhood <span class="req">*</span></label>
+          <input id="appArea" name="area" minlength="2" maxlength="120" required>
+          <p class="hint">The main area where your recycling drop-off or pickup takes place.</p>
+
+          <button type="submit" class="primary" id="submit-application-btn">Submit for approval <span aria-hidden="true">→</span></button>
+          <p class="footnote">EcoSmart verifies recycler identity and licensing to ensure marketplace trust.</p>
+        </form>
+      </div>
+
+      <!-- SCREEN 4: Recycler Marketplace Dashboard -->
+      <div id="screen-4-container" hidden>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+          <div class="recycler-info">
+            <h3 id="dash-recycler-name">Verified Recycler</h3>
+            <span class="badge-verified">✓ Verified Recycler</span>
+            <span class="badge-area" id="dash-recycler-area">Ikeja, Lagos</span>
+          </div>
+
+          <!-- Recycler Wallet Card -->
+          <div class="dashboard-wallet-card" id="rec-wallet-card">
+            <div class="wallet-card-left">
+              <span class="wallet-label">Trading Balance</span>
+              <div class="wallet-balance-row">
+                <span class="wallet-currency">₦</span>
+                <span class="wallet-balance-amount" id="rec-wallet-balance">0.00</span>
+              </div>
+              <div class="wallet-meta-tags">
+                <span class="wallet-escrow-pill" id="rec-wallet-escrow">🔒 ₦0.00 in Escrow</span>
+                <span class="wallet-subtext" id="rec-wallet-lifetime">Total Spent: ₦0.00</span>
+              </div>
+            </div>
+            <div class="wallet-card-actions">
+              <button type="button" class="btn-wallet-action btn-topup" id="btn-rec-topup">➕ Top Up</button>
+              <button type="button" class="btn-wallet-action-subtle" id="btn-rec-bank-setup">🏦 Bank Details</button>
+            </div>
+          </div>
+          
+          <!-- Availability Switch -->
+          <div class="availability-card">
+            <span class="avail-label">Marketplace Status:</span>
+            <div class="toggle-wrapper">
+              <label class="switch" for="availability-toggle">
+                <input type="checkbox" id="availability-toggle" checked>
+                <span class="slider"></span>
+              </label>
+              <span id="availability-status-text" class="status-available">Available to receive listings</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Materials & Non-binding Estimates Setup -->
+        <div class="materials-section">
+          <div class="section-heading-row">
+            <div>
+              <h3>Accepted Materials &amp; Estimated Prices</h3>
+              <p class="muted">Select which materials you buy, set your estimated price in Naira (₦), and pick a unit.</p>
+            </div>
+            <span class="non-binding-notice">Estimates only · Not final offers</span>
+          </div>
+
+          <form id="marketplace-settings-form">
+            <div id="material-settings-list" class="materials-grid">
+              <!-- Rendered dynamically by app.js for all pilot materials -->
+            </div>
+
+            <div class="dash-actions">
+              <button type="submit" class="primary" id="save-settings-btn">Save marketplace settings</button>
+              <span id="save-status-msg" class="save-status" hidden>✓ Saved successfully</span>
+            </div>
+          </form>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Incoming Generator Requests List -->
+        <div class="incoming-requests-section">
+          <div class="section-heading-row">
+            <h3>Incoming Generator Requests</h3>
+            <span class="count-pill" id="incoming-requests-count-pill">0 requests</span>
+          </div>
+          <div id="incoming-requests-list" class="incoming-requests-list">
+            <div class="empty-state-box">
+              <div class="empty-icon">📬</div>
+              <h4>No incoming requests yet</h4>
+              <p class="muted">When nearby generators select you for their recyclable waste, requests will appear here for review and handover arrangement.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Transaction Records Link -->
+        <div class="records-link-section">
+          <div>
+            <h4>Transaction Records</h4>
+            <p class="muted">View time-stamped history of completed exchanges and payout records.</p>
+          </div>
+          <button id="view-records-btn" type="button" class="text-button" disabled title="Records will populate once transactions are conducted">View records (0)</button>
+        </div>
+
+        <div class="card-footer-nav">
+          <button id="back-to-screen2-btn" type="button" class="text-button-subtle">View Verification Profile</button>
+          <button id="dash-logout-btn" type="button" class="text-button">Sign out</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 6: Listing and Handover Coordination -->
+      <div id="screen-6-container" hidden>
+        <div class="screen6-header-nav">
+          <button id="screen6-back-btn" type="button" class="text-button-subtle">← Back to dashboard</button>
+          <div class="screen6-header-badges">
+            <span class="ref-pill" id="screen6-ref-pill">REF: #LS-000</span>
+            <span class="badge badge-sent" id="screen6-status-pill">Sent to recycler</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Listing Details Card -->
+        <div class="listing-details-card" id="screen6-details-card">
+          <div class="listing-details-header">
+            <div>
+              <span class="badge badge-approved" id="screen6-material-badge">Cardboard</span>
+              <h3 id="screen6-details-title" style="margin-top: 6px;">Recyclable Material Listing</h3>
+            </div>
+            <div class="details-rate-box">
+              <span class="details-rate-label">Estimated Price:</span>
+              <strong class="details-rate-value" id="screen6-estimated-rate">₦0 / kg</strong>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Quantity:</span>
+              <span class="detail-val" id="screen6-qty-val">Unspecified</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Arrangement:</span>
+              <span class="detail-val" id="screen6-arrg-val">🚚 Pickup requested</span>
+            </div>
+            <div class="detail-item full-width">
+              <span class="detail-label">Location / Handover Address:</span>
+              <span class="detail-val" id="screen6-address-val">Address</span>
+            </div>
+            <div class="detail-item full-width" id="screen6-desc-row">
+              <span class="detail-label">Generator Notes / Description:</span>
+              <span class="detail-val" id="screen6-desc-val">None provided</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recycler Action Panel (Visible to Recycler when Pending) -->
+        <div id="screen6-recycler-action-panel" class="action-panel" hidden>
+          <div class="section-heading-row">
+            <div>
+              <h4>Recycler Response &amp; Handover Arrangement</h4>
+              <p class="muted">Review this direct request. Accept to share mutual contact information, or decline if out of capacity.</p>
+            </div>
+          </div>
+
+          <form id="recycler-response-form">
+            <fieldset>
+              <legend>Confirm handover arrangement <span class="req">*</span></legend>
+              <div class="roles">
+                <label class="role">
+                  <input type="radio" name="agreedArrangement" value="pickup" checked required>
+                  <span><strong>🚚 Recycler Pickup</strong><small>You will send transport to collect</small></span>
+                </label>
+                <label class="role">
+                  <input type="radio" name="agreedArrangement" value="drop-off" required>
+                  <span><strong>📍 Generator Drop-off</strong><small>Generator will bring items to your yard</small></span>
+                </label>
+              </div>
+            </fieldset>
+
+            <label for="screen6-arrangement-note">Handover note &amp; timing instructions</label>
+            <input id="screen6-arrangement-note" name="arrangementNote" maxlength="300" placeholder="e.g. Driver arriving tomorrow between 10am–12pm. Will call ahead.">
+            <p class="hint">These instructions will be visible to the generator once accepted.</p>
+
+            <div class="response-btn-row">
+              <button type="submit" class="primary" id="btn-accept-listing">Accept listing &amp; share contacts <span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+
+          <div class="decline-toggle-section">
+            <details>
+              <summary class="decline-summary">Unable to accept this listing? Click here to decline</summary>
+              <div class="decline-box">
+                <label for="screen6-decline-reason">Reason for declining (optional):</label>
+                <input id="screen6-decline-reason" placeholder="e.g. Currently at storage capacity for cardboard">
+                <button type="button" class="btn-pill btn-reject" id="btn-decline-listing" style="margin-top: 10px;">Confirm &amp; Decline Listing</button>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Mutual Contact Details Panel (Visible Once Accepted) -->
+        <div id="screen6-contacts-panel" class="contacts-panel" hidden>
+          <div class="contacts-panel-header">
+            <span class="banner-icon">🤝</span>
+            <div>
+              <h4>Direct Handover Contact Information</h4>
+              <p class="muted">Mutual contact details have been unlocked for direct coordination.</p>
+            </div>
+          </div>
+
+          <div class="contacts-grid">
+            <div class="contact-card">
+              <div class="contact-card-type">Generator Details</div>
+              <div class="contact-card-name" id="screen6-contact-gen-name">Name</div>
+              <div class="contact-card-detail"><strong>Email:</strong> <span id="screen6-contact-gen-email">email</span></div>
+              <div class="contact-card-detail"><strong>Handover Address:</strong> <span id="screen6-contact-gen-address">address</span></div>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-card-type">Verified Recycler Details</div>
+              <div class="contact-card-name" id="screen6-contact-rec-name">Business Name</div>
+              <div class="contact-card-detail"><strong>Phone / WhatsApp:</strong> <span id="screen6-contact-rec-phone">phone</span></div>
+              <div class="contact-card-detail"><strong>Yard Address:</strong> <span id="screen6-contact-rec-address">yard address</span></div>
+            </div>
+          </div>
+
+          <!-- Handover Progress & Next Step -->
+          <div class="handover-coordination-box" id="screen6-handover-box">
+            <div class="handover-box-header">
+              <strong id="screen6-agreed-arrg-title">Agreed Handover: 🚚 Recycler Pickup</strong>
+              <span class="timestamp-pill" id="screen6-shared-timestamp">Coordinated just now</span>
+            </div>
+            <p class="handover-note-text" id="screen6-agreed-instructions">Driver arriving tomorrow between 10am–12pm.</p>
+
+            <div class="coordination-actions-row">
+              <button type="button" class="btn-call-action" id="btn-screen6-start-call">
+                <span class="call-icon" aria-hidden="true">📞</span> Start In-App Call
+              </button>
+            </div>
+
+            <div id="screen6-recycler-complete-row" class="handover-complete-row" hidden>
+              <p class="muted" style="font-size: 13px; margin-bottom: 8px;">After physical materials are exchanged, mark the handover completed to proceed to inspection and final offer.</p>
+              <button type="button" class="primary" id="btn-mark-handover-complete">Handover completed / Proceed to inspection <span aria-hidden="true">→</span></button>
+            </div>
+            <div id="screen6-proceed-screen7-row" style="margin-top: 12px;" hidden>
+              <button type="button" class="primary" id="btn-goto-screen7">Proceed to Inspection &amp; Final Offer <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+
+          <!-- IN-APP CALL (FR-19) -->
+          <div class="call-section" id="screen6-call-section" hidden>
+            <!-- Incoming Call Banner -->
+            <div class="call-banner incoming-call-banner" id="incoming-call-box" hidden>
+              <div class="call-banner-left">
+                <span class="call-pulse-ring">📞</span>
+                <div>
+                  <h4 class="call-title" id="incoming-caller-title">Incoming In-App Call…</h4>
+                  <p class="call-subtitle" id="incoming-caller-subtitle">Verified Recycler is calling you</p>
+                </div>
+              </div>
+              <div class="call-actions-row">
+                <button type="button" class="btn-call-answer" id="btn-call-answer">✓ Answer</button>
+                <button type="button" class="btn-call-decline" id="btn-call-decline">✕ Decline</button>
+              </div>
+            </div>
+
+            <!-- Outgoing Ringing Banner -->
+            <div class="call-banner outgoing-call-banner" id="outgoing-call-box" hidden>
+              <div class="call-banner-left">
+                <span class="call-pulse-ring outgoing">📞</span>
+                <div>
+                  <h4 class="call-title">Calling…</h4>
+                  <p class="call-subtitle" id="outgoing-call-subtitle">Ringing participant…</p>
+                </div>
+              </div>
+              <div class="call-actions-row">
+                <button type="button" class="btn-call-end" id="btn-call-cancel">Cancel Call</button>
+              </div>
+            </div>
+
+            <!-- Active Connected Call Box -->
+            <div class="call-banner active-call-box" id="active-call-box" hidden>
+              <div class="call-banner-left">
+                <span class="call-connected-dot"></span>
+                <div>
+                  <div class="active-call-header">
+                    <h4 class="call-title" id="active-call-title">In-App Voice Call</h4>
+                    <span class="call-timer-badge" id="call-duration-timer">00:00</span>
+                  </div>
+                  <p class="call-subtitle" id="active-call-participant">Connected with Verified Recycler</p>
+                </div>
+              </div>
+              <div class="call-actions-row">
+                <button type="button" class="btn-call-mute" id="btn-call-mute">🎤 Mute</button>
+                <button type="button" class="btn-call-end" id="btn-call-end">End Call</button>
+              </div>
+            </div>
+
+            <div id="call-feedback-msg" class="call-feedback" hidden></div>
+          </div>
+
+          <!-- IN-APP CHAT (FR-18) -->
+          <div class="chat-section" id="screen6-chat-section">
+            <div class="chat-header">
+              <div class="chat-header-title">
+                <span class="chat-indicator-dot"></span>
+                <strong>Direct Coordination Chat</strong>
+              </div>
+              <span class="muted" id="chat-participants-label" style="font-size: 11.5px;">Direct exchange messages</span>
+            </div>
+
+            <div class="chat-messages-container" id="chat-messages-stream">
+              <div class="chat-empty-msg">No messages yet. Send a message to coordinate pickup timing or yard drop-off directions.</div>
+            </div>
+
+            <form id="screen6-chat-form" class="chat-input-row">
+              <input type="text" id="screen6-chat-input" placeholder="Type a message (e.g. What time works best for you?)" maxlength="1000" autocomplete="off" required>
+              <button type="submit" class="primary btn-chat-send" id="btn-screen6-chat-send">Send</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Declined State Alert (Visible when Declined) -->
+        <div id="screen6-declined-panel" class="declined-panel" hidden>
+          <div class="guidance-header">
+            <span class="badge badge-rejected">Listing Declined</span>
+            <h4>Recycler was unable to take this listing</h4>
+          </div>
+          <p id="screen6-decline-note-text" class="declined-reason-note">Reason: Currently at storage capacity.</p>
+          <div id="screen6-generator-rematch-row" style="margin-top: 16px;" hidden>
+            <p class="muted" style="font-size: 13px; margin-bottom: 10px;">You can select another verified buyer in your area without re-entering your waste details.</p>
+            <button id="screen6-rematch-btn" type="button" class="primary">Choose another verified buyer <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+
+        <div class="card-footer-nav">
+          <button id="screen6-logout-btn" type="button" class="text-button">Sign out</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 7: Inspection, Final Offer, Decision, and Payout -->
+      <div id="screen-7-container" hidden>
+        <div class="screen6-header-nav">
+          <button id="screen7-back-btn" type="button" class="text-button-subtle">← Back to listing</button>
+          <div class="screen6-header-badges">
+            <span class="ref-pill" id="screen7-ref-pill">REF: #LS-000</span>
+            <span class="badge badge-approved" id="screen7-status-pill">Handover Arranged</span>
+          </div>
+        </div>
+
+        <!-- 24-Hour Expiry Countdown Banner -->
+        <div id="screen7-countdown-banner" class="countdown-banner" hidden>
+          <span class="countdown-icon" aria-hidden="true">⏳</span>
+          <div>
+            <strong>24-Hour Final Offer Window Active</strong>
+            <p class="countdown-desc">Generator must accept or reject before expiry: <span id="screen7-countdown-text" class="countdown-timer">23h 59m 59s</span></p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Listing & Material Info Card -->
+        <div class="listing-details-card" id="screen7-summary-card">
+          <div class="listing-details-header">
+            <div>
+              <span class="badge badge-approved" id="screen7-material-badge">Cardboard</span>
+              <h3 id="screen7-summary-title" style="margin-top: 6px;">Material Inspection &amp; Final Offer</h3>
+            </div>
+            <div class="details-rate-box">
+              <span class="details-rate-label">Initial Estimate:</span>
+              <strong class="details-rate-value" id="screen7-initial-estimate">₦0 / kg</strong>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Generator:</span>
+              <span class="detail-val" id="screen7-gen-name">Generator User</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Recycler / Buyer:</span>
+              <span class="detail-val" id="screen7-rec-name">Verified Recycler</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Declared Quantity:</span>
+              <span class="detail-val" id="screen7-declared-qty">Unspecified</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Handover Arrangement:</span>
+              <span class="detail-val" id="screen7-arrg-val">🚚 Pickup</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECYCLER FORM: Record Inspection & Fund Final Offer -->
+        <div id="screen7-recycler-form-panel" class="action-panel" hidden>
+          <div class="section-heading-row">
+            <div>
+              <h4>Physical Inspection &amp; Funded Final Offer</h4>
+              <p class="muted">Enter actual measured weight and fund the exact final payment. Offers cannot be sent unfunded.</p>
+            </div>
+          </div>
+
+          <form id="inspection-offer-form">
+            <div class="form-row">
+              <div class="form-col">
+                <label for="screen7-actual-qty">Actual measured weight / quantity <span class="req">*</span></label>
+                <input type="number" id="screen7-actual-qty" name="actualQuantity" min="0.01" step="any" placeholder="e.g. 15.5" required>
+              </div>
+              <div class="form-col">
+                <label for="screen7-actual-unit">Measurement unit <span class="req">*</span></label>
+                <select id="screen7-actual-unit" name="actualUnit" required>
+                  <option value="kg">Kilograms (kg)</option>
+                  <option value="items">Items / Pieces</option>
+                  <option value="bags">Bags</option>
+                </select>
+              </div>
+            </div>
+
+            <label for="screen7-inspection-note">Inspection notes &amp; material condition (optional)</label>
+            <input id="screen7-inspection-note" name="inspectionNote" maxlength="300" placeholder="e.g. Clean corrugated cardboard, dry and sorted, minimal tape.">
+
+            <label for="screen7-offer-amount">Final offer amount in Naira (₦) <span class="req">*</span></label>
+            <div class="price-input-wrapper">
+              <span class="currency-prefix">₦</span>
+              <input type="number" id="screen7-offer-amount" name="amount" min="1" step="any" placeholder="e.g. 2500" required>
+            </div>
+            <p class="hint">This exact amount will be funded into escrow before the offer is dispatched to the generator.</p>
+
+            <!-- Funding Breakdown Card -->
+            <div class="funding-breakdown-card">
+              <div class="funding-row">
+                <span>Final Purchase Offer:</span>
+                <strong id="screen7-breakdown-offer">₦0.00</strong>
+              </div>
+              <div class="funding-row">
+                <span>Platform Commission Fee (Pilot):</span>
+                <span class="commission-free">₦0.00 (0% Free Pilot)</span>
+              </div>
+              <div class="funding-row total">
+                <span>Total to Fund into Escrow:</span>
+                <strong id="screen7-breakdown-total" style="color: #173d2f;">₦0.00</strong>
+              </div>
+            </div>
+
+            <div class="response-btn-row">
+              <button type="submit" class="primary" id="btn-fund-send-offer">Fund &amp; Send Final Offer <span aria-hidden="true">→</span></button>
+            </div>
+            <p class="footnote">Guaranteed escrow funding: funds are locked in advance to assure generator payment.</p>
+          </form>
+        </div>
+
+        <!-- GENERATOR PANEL: Review Funded Offer & Make Decision -->
+        <div id="screen7-generator-decision-panel" class="action-panel" hidden>
+          <div class="section-heading-row">
+            <div>
+              <h4>Funded Final Offer Received</h4>
+              <p class="muted">The recycler has completed physical inspection and locked in your payment in escrow.</p>
+            </div>
+          </div>
+
+          <!-- Verified Inspection Summary Box -->
+          <div class="inspection-results-card">
+            <div class="inspection-metric-grid">
+              <div class="metric-item">
+                <span class="metric-label">Verified Weight:</span>
+                <strong class="metric-val" id="screen7-verified-weight">0 kg</strong>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Recycler Grade / Note:</span>
+                <span class="metric-note" id="screen7-verified-note">Clean material</span>
+              </div>
+            </div>
+
+            <!-- Payout Highlight Box -->
+            <div class="payout-highlight-box">
+              <div class="payout-badge">✓ Guaranteed Escrow Funded</div>
+              <div class="payout-amount-label">Net Payout to You (0% Commission):</div>
+              <div class="payout-amount" id="screen7-payout-amount">₦0.00</div>
+              <span class="payout-note">Accepting immediately releases the full payment to you.</span>
+            </div>
+          </div>
+
+          <!-- Decision Action Row -->
+          <div class="decision-action-row">
+            <button type="button" class="primary" id="btn-accept-offer">Accept Final Offer &amp; Receive Payout <span aria-hidden="true">→</span></button>
+            <button type="button" class="secondary" id="btn-reject-offer-toggle">Reject Offer</button>
+          </div>
+
+          <!-- Rejection Drawer -->
+          <div id="screen7-rejection-drawer" class="decline-box" style="margin-top: 14px;" hidden>
+            <label for="screen7-rejection-reason">Reason for rejecting (optional):</label>
+            <input id="screen7-rejection-reason" placeholder="e.g. Weight measured lower than expected">
+            <div style="margin-top: 10px;">
+              <button type="button" class="btn-pill btn-reject" id="btn-confirm-reject-offer">Confirm &amp; Reject Final Offer</button>
+            </div>
+            <p class="hint" style="margin-top: 6px;">Rejecting cancels the transaction and returns escrow funds to the buyer with no payout.</p>
+          </div>
+        </div>
+
+        <!-- COMPLETED / TERMINAL RESULT RECEIPT -->
+        <div id="screen7-receipt-panel" class="receipt-panel" hidden>
+          <div class="receipt-header">
+            <div class="receipt-icon" id="screen7-receipt-icon">✓</div>
+            <div>
+              <h4 id="screen7-receipt-title">Transaction Completed &amp; Payout Released</h4>
+              <p class="muted" id="screen7-receipt-subtitle">100% of payment released with zero commission.</p>
+            </div>
+          </div>
+
+          <div class="receipt-body">
+            <div class="receipt-row">
+              <span>Transaction Reference:</span>
+              <strong id="screen7-receipt-ref">REF-ECO-00000</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Payment Amount:</span>
+              <strong id="screen7-receipt-amount">₦0.00</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Commission Deducted:</span>
+              <span class="commission-free">₦0.00 (0% Free Pilot)</span>
+            </div>
+            <div class="receipt-row">
+              <span>Payment Status:</span>
+              <span class="badge badge-approved" id="screen7-receipt-status-badge">Released</span>
+            </div>
+            <div class="receipt-row">
+              <span>Completed At:</span>
+              <span id="screen7-receipt-time">Just now</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIME-STAMPED CORE AUDIT TRAIL / EVENT HISTORY -->
+        <div class="audit-trail-section" id="screen7-audit-trail-section">
+          <div class="section-heading-row">
+            <h4>Time-stamped Transaction Audit Trail</h4>
+            <span class="count-pill" id="screen7-audit-count-pill">0 events</span>
+          </div>
+
+          <div class="audit-timeline" id="screen7-audit-timeline">
+            <!-- Timeline items rendered dynamically by app.js -->
+          </div>
+        </div>
+
+        <div class="card-footer-nav">
+          <button id="screen7-logout-btn" type="button" class="text-button">Sign out</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 8: Administrator Workspace & Marketplace Records (FR-17) -->
+      <div id="screen-8-container" hidden>
+        <div class="screen8-header-nav">
+          <div class="screen8-title-group">
+            <span class="badge badge-admin">SCREEN 8 · FR-17: RECORDS &amp; ADMINISTRATION</span>
+            <h3 id="screen8-main-heading">Pilot Administrator Workspace</h3>
+            <p class="muted">Manage verification queue, pilot material catalogue, and search audit records.</p>
+          </div>
+          <button id="admin-close-btn" type="button" class="text-button-subtle">← Return to Dashboard</button>
+        </div>
+
+        <!-- Admin Workspace Navigation Tabs -->
+        <div class="admin-tabs" role="tablist">
+          <button type="button" class="admin-tab-btn active" id="admin-tab-apps" role="tab" aria-selected="true">
+            📋 Verification Queue <span class="badge" id="admin-apps-badge">0</span>
+          </button>
+          <button type="button" class="admin-tab-btn" id="admin-tab-materials" role="tab" aria-selected="false">
+            📦 Materials Catalogue
+          </button>
+          <button type="button" class="admin-tab-btn" id="admin-tab-records" role="tab" aria-selected="false">
+            🔍 Marketplace Records &amp; Audit
+          </button>
+          <button type="button" class="admin-tab-btn" id="admin-tab-myrecords" role="tab" aria-selected="false">
+            🧾 My Transaction History
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- TAB PANEL 1: RECYCLER VERIFICATION QUEUE -->
+        <div id="admin-apps-panel" class="admin-panel">
+          <div class="section-heading-row">
+            <div>
+              <h4>Recycler Verification Applications</h4>
+              <p class="muted">Review government ID, business registration, and licensing documents to approve or reject recyclers.</p>
+            </div>
+            <div class="filter-pills" id="admin-apps-filter-group">
+              <button type="button" class="filter-pill active" data-filter="all" id="filter-apps-all">All (<span id="apps-count-all">0</span>)</button>
+              <button type="button" class="filter-pill" data-filter="pending" id="filter-apps-pending">Pending (<span id="apps-count-pending">0</span>)</button>
+              <button type="button" class="filter-pill" data-filter="approved" id="filter-apps-approved">Approved (<span id="apps-count-approved">0</span>)</button>
+              <button type="button" class="filter-pill" data-filter="rejected" id="filter-apps-rejected">Rejected (<span id="apps-count-rejected">0</span>)</button>
+            </div>
+          </div>
+
+          <div id="admin-apps-list" class="admin-cards-list">
+            <!-- Rendered dynamically by app.js -->
+            <p class="muted empty-note">Loading recycler applications...</p>
+          </div>
+        </div>
+
+        <!-- TAB PANEL 2: SUPPORTED MATERIALS CATALOGUE -->
+        <div id="admin-materials-panel" class="admin-panel" hidden>
+          <div class="section-heading-row">
+            <div>
+              <h4>Pilot Supported Materials Catalogue</h4>
+              <p class="muted">Add new materials, update preparation guidance, or activate/deactivate materials in real time.</p>
+            </div>
+          </div>
+
+          <!-- Add / Edit Material Form -->
+          <div class="material-editor-card">
+            <h5 id="material-form-title">Add New Supported Material</h5>
+            <form id="admin-material-form" class="admin-material-form">
+              <input type="hidden" id="admin-mat-id" name="id">
+              <div class="form-row">
+                <div class="form-col">
+                  <label for="admin-mat-name">Material Name <span class="req">*</span></label>
+                  <input id="admin-mat-name" name="name" placeholder="e.g. Copper Wire, HDPE Plastics" required>
+                </div>
+                <div class="form-col" style="display: flex; gap: 16px; align-items: flex-end; padding-bottom: 8px;">
+                  <label class="checkbox-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" id="admin-mat-recyclable" checked>
+                    <strong>Recyclable in pilot</strong>
+                  </label>
+                  <label class="checkbox-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" id="admin-mat-active" checked>
+                    <strong>Active in intake &amp; matching</strong>
+                  </label>
+                </div>
+              </div>
+
+              <label for="admin-mat-guidance">Preparation &amp; Recycling Guidance <span class="req">*</span></label>
+              <textarea id="admin-mat-guidance" name="guidance" rows="3" placeholder="e.g. Strip outer insulation and bundle cleanly. Store in dry condition." required></textarea>
+
+              <div class="form-actions" style="margin-top: 10px; display: flex; gap: 10px;">
+                <button type="submit" class="primary" id="admin-mat-submit-btn">Save Material</button>
+                <button type="button" class="secondary" id="admin-mat-cancel-btn" hidden>Cancel Edit</button>
+              </div>
+            </form>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <h5>Existing Catalogue Items</h5>
+            <div id="admin-materials-list" class="materials-catalogue-grid">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB PANEL 3: PILOT MARKETPLACE RECORDS & AUDIT -->
+        <div id="admin-records-panel" class="admin-panel" hidden>
+          <!-- Summary Metrics -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="metric-label">Total Listings</span>
+              <strong class="metric-value" id="admin-stat-total">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Completed &amp; Paid</span>
+              <strong class="metric-value" id="admin-stat-completed">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Active Funded Offers</span>
+              <strong class="metric-value" id="admin-stat-active">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Handover Coordinated</span>
+              <strong class="metric-value" id="admin-stat-handover">0</strong>
+            </div>
+          </div>
+
+          <div class="section-heading-row" style="margin-top: 20px;">
+            <div>
+              <h4>Search Pilot Transactions &amp; Audit Trail</h4>
+              <p class="muted">Search across all pilot listings by listing reference, material, generator, recycler, or address.</p>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="admin-search-bar">
+            <input type="search" id="admin-record-search-input" placeholder="Search reference, material, generator, recycler, area..." autocomplete="off">
+            <select id="admin-record-status-filter">
+              <option value="">All Statuses</option>
+              <option value="sent to recycler">Sent to Recycler</option>
+              <option value="accepted">Accepted / In Progress</option>
+              <option value="declined">Declined</option>
+              <option value="inspected">Inspected</option>
+              <option value="funded final offer">Funded Final Offer</option>
+              <option value="completed">Completed &amp; Paid</option>
+              <option value="rejected final offer">Rejected Final Offer</option>
+            </select>
+            <button type="button" class="secondary" id="admin-record-refresh-btn">Search / Refresh</button>
+          </div>
+
+          <div id="admin-records-list" class="admin-records-list" style="margin-top: 16px;">
+            <!-- Rendered dynamically by app.js -->
+            <p class="muted empty-note">Loading marketplace records...</p>
+          </div>
+        </div>
+
+        <!-- TAB PANEL 4: MY TRANSACTION RECORDS (USER-SPECIFIC) -->
+        <div id="admin-myrecords-panel" class="admin-panel" hidden>
+          <div class="section-heading-row">
+            <div>
+              <h4 id="user-records-heading">Your Transaction History &amp; Receipts</h4>
+              <p class="muted" id="user-records-subheading">All your past and active recyclable waste transactions with status receipts, payment references, and time-stamped milestone audit history.</p>
+            </div>
+          </div>
+
+          <!-- User Personal Metrics -->
+          <div class="metrics-grid" id="user-metrics-grid" style="margin-bottom: 16px;">
+            <div class="metric-card">
+              <span class="metric-label" id="user-metric-label-total">Total Transactions</span>
+              <strong class="metric-value" id="user-stat-total">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Completed &amp; Paid</span>
+              <strong class="metric-value" id="user-stat-completed">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Active / In Progress</span>
+              <strong class="metric-value" id="user-stat-active">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Total Volume (kg)</span>
+              <strong class="metric-value" id="user-stat-volume">0 kg</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label" id="user-metric-label-amount">Total Value (₦)</span>
+              <strong class="metric-value" id="user-stat-amount" style="color: #15623e;">₦0</strong>
+            </div>
+          </div>
+
+          <!-- User Search & Filter Toolbar -->
+          <div class="admin-search-bar" style="margin-bottom: 14px;">
+            <input type="search" id="user-record-search-input" placeholder="Search by reference, material, buyer/seller name, location..." autocomplete="off">
+            <select id="user-record-status-filter">
+              <option value="">All Transactions</option>
+              <option value="in_progress">Active / In Progress</option>
+              <option value="completed">Completed &amp; Paid</option>
+              <option value="declined_rejected">Declined / Rejected</option>
+              <option value="expired">Expired</option>
+            </select>
+            <button type="button" class="secondary" id="user-record-refresh-btn">Search / Filter</button>
+          </div>
+
+          <div id="admin-myrecords-list" class="admin-records-list">
+            <!-- Rendered dynamically by app.js -->
+            <p class="muted empty-note">Loading your records...</p>
+          </div>
+        </div>
+
+        <div class="card-footer-nav">
+          <button id="screen8-back-btn" type="button" class="text-button">Return to Dashboard</button>
+        </div>
+      </div>
+
+      <!-- MODAL: Wallet Top-Up (Recycler) -->
+      <div id="wallet-topup-modal" class="wallet-modal-backdrop" hidden>
+        <div class="wallet-modal-card">
+          <div class="wallet-modal-header">
+            <h4>Add Demo Wallet Credit</h4>
+            <button type="button" class="btn-close-modal" id="btn-close-topup-modal" title="Close">✕</button>
+          </div>
+          <form id="wallet-topup-form" class="wallet-modal-body">
+            <p class="muted" style="font-size: 13px; margin: 0 0 12px;">Add demo credit to test the escrow flow. No real payment is collected.</p>
+            
+            <label for="topup-amount-input">Top-Up Amount (₦) <span class="req">*</span></label>
+            <div class="currency-input-wrap">
+              <span class="currency-prefix">₦</span>
+              <input type="number" id="topup-amount-input" min="100" max="5000000" step="500" placeholder="e.g. 50000" required>
+            </div>
+
+            <!-- Quick Preset Chips -->
+            <div class="preset-chips-row">
+              <button type="button" class="preset-chip" data-amount="10000">₦10,000</button>
+              <button type="button" class="preset-chip" data-amount="25000">₦25,000</button>
+              <button type="button" class="preset-chip" data-amount="50000">₦50,000</button>
+              <button type="button" class="preset-chip" data-amount="100000">₦100,000</button>
+              <button type="button" class="preset-chip" data-amount="250000">₦250,000</button>
+            </div>
+
+            <fieldset style="margin-top: 14px;">
+              <legend>Payment Channel</legend>
+              <div class="roles">
+                <label class="role">
+                  <input type="radio" name="topupChannel" value="instant_transfer" checked required>
+                  <span><strong>⚡ Instant Simulated Transfer</strong><small>Instant credit for testing</small></span>
+                </label>
+                
+                
+              </div>
+            </fieldset>
+
+            <button type="submit" class="primary" id="btn-submit-topup" style="margin-top: 16px;">Complete Top-Up <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL: Bank Account Setup (Generator & Recycler) -->
+      <div id="wallet-bank-modal" class="wallet-modal-backdrop" hidden>
+        <div class="wallet-modal-card">
+          <div class="wallet-modal-header">
+            <h4>🏦 Link Nigerian Bank Account</h4>
+            <button type="button" class="btn-close-modal" id="btn-close-bank-modal" title="Close">✕</button>
+          </div>
+          <form id="wallet-bank-form" class="wallet-modal-body">
+            <p class="muted" style="font-size: 13px; margin: 0 0 12px;">Save bank details for later use. Bank verification and real withdrawals are not available yet.</p>
+            
+            <label for="bank-code-select">Select Bank <span class="req">*</span></label>
+            <select id="bank-code-select" required>
+              <option value="" disabled selected>-- Choose your bank --</option>
+              <option value="044" data-name="Access Bank">Access Bank</option>
+              <option value="058" data-name="Guaranty Trust Bank (GTBank)">Guaranty Trust Bank (GTBank)</option>
+              <option value="057" data-name="Zenith Bank">Zenith Bank</option>
+              <option value="011" data-name="First Bank of Nigeria">First Bank of Nigeria</option>
+              <option value="033" data-name="United Bank for Africa (UBA)">United Bank for Africa (UBA)</option>
+              <option value="090267" data-name="Kuda Bank">Kuda Microfinance Bank</option>
+              <option value="100004" data-name="OPay">OPay Digital Services</option>
+              <option value="100033" data-name="PalmPay">PalmPay</option>
+              <option value="232" data-name="Sterling Bank">Sterling Bank</option>
+              <option value="221" data-name="Stanbic IBTC Bank">Stanbic IBTC Bank</option>
+              <option value="214" data-name="First City Monument Bank (FCMB)">First City Monument Bank (FCMB)</option>
+              <option value="070" data-name="Fidelity Bank">Fidelity Bank</option>
+              <option value="035" data-name="Wema Bank / ALAT">Wema Bank / ALAT</option>
+              <option value="032" data-name="Union Bank of Nigeria">Union Bank of Nigeria</option>
+            </select>
+
+            <label for="bank-account-num">10-Digit NUBAN Account Number <span class="req">*</span></label>
+            <input type="text" id="bank-account-num" maxlength="10" placeholder="e.g. 0123456789" pattern="[0-9]{10}" required>
+
+            <label for="bank-account-name">Account holder name (unverified)</label>
+            <input type="text" id="bank-account-name" placeholder="Enter account holder name" required style="background: #f1f6f3; color: #164e33; font-weight: 700;">
+
+            <div class="verified-bank-badge-row" id="bank-verified-indicator" hidden>
+              <span class="badge badge-approved">✓ Bank details saved — not verified</span>
+            </div>
+
+            <button type="submit" class="primary" id="btn-save-bank-account" style="margin-top: 16px;">Save Bank Details <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL: Withdrawal / Cash Out (Generator & Recycler) -->
+      <div id="wallet-withdraw-modal" class="wallet-modal-backdrop" hidden>
+        <div class="wallet-modal-card">
+          <div class="wallet-modal-header">
+            <h4>Demo Withdrawal</h4>
+            <button type="button" class="btn-close-modal" id="btn-close-withdraw-modal" title="Close">✕</button>
+          </div>
+          <form id="wallet-withdraw-form" class="wallet-modal-body">
+            <div class="withdraw-balance-banner">
+              <span class="withdraw-banner-label">Available for Cash Out:</span>
+              <strong class="withdraw-banner-amount" id="withdraw-modal-avail-balance">₦0.00</strong>
+            </div>
+
+            <div class="withdraw-dest-card" id="withdraw-dest-card">
+              <span class="dest-label">Destination Bank Account:</span>
+              <div id="withdraw-saved-bank-info">
+                <strong id="withdraw-dest-bank-name">No bank account linked</strong>
+                <span class="muted" id="withdraw-dest-acct-num">Link your bank account first to cash out</span>
+              </div>
+              <button type="button" class="text-button" id="btn-withdraw-change-bank" style="font-size: 12px; margin-top: 4px;">Link / Change Bank Account</button>
+            </div>
+
+            <label for="withdraw-amount-input">Withdrawal Amount (₦) <span class="req">*</span></label>
+            <div class="currency-input-wrap">
+              <span class="currency-prefix">₦</span>
+              <input type="number" id="withdraw-amount-input" min="500" step="100" placeholder="e.g. 5000" required>
+            </div>
+
+            <!-- Quick Preset Chips for Withdrawal -->
+            <div class="preset-chips-row">
+              <button type="button" class="preset-withdraw-chip" data-amount="1000">₦1,000</button>
+              <button type="button" class="preset-withdraw-chip" data-amount="5000">₦5,000</button>
+              <button type="button" class="preset-withdraw-chip" data-amount="10000">₦10,000</button>
+              <button type="button" class="preset-withdraw-chip" data-amount="all">All Funds</button>
+            </div>
+
+            <div class="fee-breakdown-box">
+              <div class="fee-row">
+                <span>Transfer Fee:</span> <strong>₦0.00 (Zero pilot fee)</strong>
+              </div>
+              <div class="fee-row">
+                <span>Payout Speed:</span> <strong>Demo only — no bank transfer</strong>
+              </div>
+            </div>
+
+            <button type="submit" class="primary" id="btn-submit-withdrawal" style="margin-top: 16px;">Record Demo Withdrawal <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+      </div>
+
+      <noscript>Enable JavaScript to create your account and verify your email.</noscript>
+    </section>
+    
+
+  </main>
+  <footer>EcoSmart <span>Connecting communities through recycling.</span></footer>
+</body>
+</html>

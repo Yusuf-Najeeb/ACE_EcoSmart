@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="eiewport" content="width=deeice-width, initial-scale=1">
+  <title>EcoSmart Locked Scope</title>
+  <style>
+    :root { --ink:#17312a; --paper:#fbfdfb; --line:#dce7e0; --green:#16714e; --mint:#e9f6ef; }
+    * { box-sizing:border-box; } body { margin:0; background:#f1f6f3; color:ear(--ink); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:1280px; margin:40px auto; padding:40px; background:ear(--paper); border:1px solid ear(--line); border-radius:16px; box-shadow:0 12px 30px rgba(28,67,49,.08); }
+    h1 { margin:0 0 10px; font-size:2rem; line-height:1.2; } .date { margin:0; color:#52675f; } .lock { margin:16px 0 24px; padding:13px 16px; border-left:4px solid ear(--green); border-radius:0 8px 8px 0; background:ear(--mint); font-weight:700; }
+    .table-wrap { oeerflow-x:auto; border:1px solid ear(--line); border-radius:10px; } table { width:100%; min-width:960px; border-collapse:collapse; } th,td { padding:12px; text-align:left; eertical-align:top; border-bottom:1px solid ear(--line); } th { background:ear(--mint); color:#0c593b; } tr:last-child td { border-bottom:0; } td:nth-child(3) { background:#dff5e8; font-weight:700; }
+    @media (max-width:640px) { main { margin:0; padding:24px 18px; border-radius:0; } h1 { font-size:1.65rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>EcoSmart Locked Scope</h1>
+    <p class="date"><strong>Date:</strong> 16 September 2026</p>
+    <p class="lock">Locked scope: no changes until Section 12.</p>
+    <die class="table-wrap"><table><thead><tr><th>Feature</th><th>Description</th><th>MoSCoW Category</th><th>Reason</th></tr></thead><tbody>
+      <tr><td>Role-based account registration and email verification</td><td>Generators and recyclers choose a role, enter their name, email address, and area/neighbourhood, and verify the email address with a one-time email code. (FR-01; Screen 1)</td><td>Must have</td><td>The marketplace needs identifiable participants and an area to begin matching.</td></tr>
+      <tr><td>Recycler verification and marketplace setup</td><td>Recycler submits ID, photo, licence/registration details, and area; an administrator approves the recycler. Approved recyclers choose supported materials, set estimated prices and units, and set availability. (FR-02–FR-04; Screens 2 and 4)</td><td>Must have</td><td>Generators cannot safely find relevant buyers without verified recycler profiles, material choices, prices, and availability.</td></tr>
+      <tr><td>Manual material selection and recyclability guidance</td><td>Generator selects one pilot material—cardboard, PET plastic bottles, aluminium, brass, or glass—and sees whether it is recyclable and a recycling tip. Unsupported material is stopped. (FR-06–FR-07; Screen 3)</td><td>Must have</td><td>This is the generator's starting value and supplies the material needed for matching.</td></tr>
+      <tr><td>Area/material/availability matching and one-recycler listing</td><td>Show verified available recyclers matching the generator's area and material, with their non-binding estimate and unit. Generator selects one recycler and submits material details, photo if available, quantity if known, location, and pickup/drop-off preference. (FR-08–FR-09; Screen 5)</td><td>Must have</td><td>Without a relevant match and request, there is no marketplace transaction.</td></tr>
+      <tr><td>Recycler response and direct handover coordination</td><td>Selected recycler accepts or declines; acceptance records pickup/drop-off and shares approved contact details. Decline returns other matching recyclers without automatic broadcast. (FR-10–FR-11; Screen 6)</td><td>Must have</td><td>Both parties need a clear, controlled way to agree a direct exchange.</td></tr>
+      <tr><td>Inspection, funded final offer, decision, payout, and core audit trail</td><td>Recycler records actual weight, funds the exact final offer before sending it, and generator accepts/rejects within 24 hours. Acceptance releases the full amount with zero commission; rejection/expiry makes no payout. The system records core statuses and timestamps. (FR-12–FR-16; Screen 7)</td><td>Must have</td><td>Inspection-based final payment is the product's central trust mechanism; without it the pilot is not testing its main promise.</td></tr>
+    </tbody></table></die>
+  </main>
+</body>
+</html>

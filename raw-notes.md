@@ -1,0 +1,284 @@
+# EcoSmart business model working session
+
+Date: 15 September 2026  
+Status: Reframed first draft. The problem, first customer, and pilot are specific enough to test; they are not yet proven at scale.
+
+## Original canvas points
+
+### Problem
+
+The original workbook described a broad audience: everyday individuals, Nigerian households, SMEs, informal recyclers, recycling companies, and processing plants. It claimed that people do not know what can be recycled, what waste is worth, or how to find a buyer; recyclable material is therefore discarded, burned, or left to clog drains, while recyclers cannot reliably source clean, sorted material.
+
+### Original solution and UVP
+
+EcoSmart was framed as an AI-powered marketplace that identifies recyclable materials, estimates value, and connects buyers and sellers. The stated value proposition was easier, fairer recyclable-material trading through identification, valuation, and matching, versus buyer-limited platforms such as Chanja Datti, Wecyclers, TrashCoin, and Ecobarter.
+
+### Original customer and evidence
+
+The canvas called waste buyers and collection aggregators in Gwagwalada, Abuja the primary ICP. It recorded one buyer who sourced roughly 70% of recyclable material from scavengers, made about 60% more profit when sourcing directly, sometimes borrowed to pay suppliers, feared fraud after losing ₦9 million in one deal, and traded PET bottles, aluminium cans, malt cans, brass, cardboard, and other metals.
+
+### Original assumptions and plan
+
+- An AI valuation model could be trained from field data.
+- Trust, verified badges, completed-transaction counts, and ratings would make the marketplace safe.
+- CAC would be ₦2,000 to ₦5,000 per onboarded user.
+- Month-six targets were ₦500,000 to ₦1,000,000 GMV and 3% to 4% commission revenue.
+- Costs listed were ₦9,060,000 total, including ₦7,200,000 other costs.
+
+## Forcing questions, answers, and pushback
+
+### 1. Who exactly has the first problem?
+
+**Question:** A marketplace cannot serve households, SMEs, recyclers, processors, buyers, sellers, and scavengers at once. Who is the first customer?
+
+**Answer:** Independent recyclers/dealers at Pantaker, Phase 4, Kubwa, Abuja. A community leader represents about 100 recyclers: about 70% deal in metal scraps and 30% in PET.
+
+**Evidence:** Direct interviews with the community leader and recyclers. Metal dealers buy at about ₦550/kg and report earnings up to ₦400,000 monthly when reselling to recycling companies. Plastic dealers buy at about ₦150/kg and report ₦100,000 to ₦120,000 monthly.
+
+**Decision:** Start with verified Pantaker metal-scrap dealers, not a broad two-sided marketplace. Metal dealers are the first wedge because they are the larger interviewed group and report the higher earnings.
+
+### 2. What is the painful moment?
+
+**Question:** Where does a dealer lose money or miss supply today?
+
+**Answer:** Fraudulent transactions, paid-for but undelivered recyclables, and purchases later alleged to be stolen. One interviewee lost about ₦9 million in a single transaction in 2023. Dealers also face resale-price fluctuation when selling to recycling companies.
+
+**Pushback:** A listing marketplace alone could make fraud easier. Public prices can improve decisions but cannot remove price risk. The first job is safer transacting beyond a dealer's trust network.
+
+### 3. What is the status quo and why would they switch?
+
+**Question:** What safeguards do dealers use now, and what could make them reject EcoSmart?
+
+**Answer:** Dealers depend on trust networks, inspect and verify materials first-hand before paying, and request receipts or written agreements when a receipt is unavailable. No cash is held until delivery confirmation. Trust networks reduce fraud but restrict free trading and growth.
+
+**Known objection:** Smartphone or mobile-data access may be a barrier. This is an assumption, not validated evidence. The claim that low earners will work around it for more customers is unproven.
+
+### 4. Who else already solves part of this?
+
+**Question:** What do Chanja Datti, Wecyclers, TrashCoin, and Ecobarter do, and where do they fail this buyer?
+
+**Answer:** The team reports that these services mainly buy from scavengers and waste generators, operate a closed marketplace, pay on delivery, and focus more on PET than metal scraps. Their payment-on-delivery process materially lowers fraud risk. Pantaker dealers instead buy directly from people and need to verify material before payment.
+
+**Conclusion:** EcoSmart must not position itself as the first platform that pays only on delivery. Its distinction is an open-network, dealer-facing workflow for verified metal transactions, rather than a managed closed buyer for primarily PET.
+
+### 5. What exactly is sold first, and what is the value proposition?
+
+**Initial answer:** "Anyone with waste recyclable" could sell; parties could choose pickup or drop-off; transport could be paid by either party. EcoSmart would verify identity, media, weight, location, proof of ownership, receipt, dealer confirmation, and payment release. Payment would release after buyer inspection, less a 4% commission.
+
+**Pushback:** "Anyone" is not an initial customer segment. Photos, IDs, receipts, and location create a record; they do not prove lawful ownership or guarantee that material is not stolen. An in-app wallet does not prove willingness to pay a commission.
+
+**Decision:** For the first six weeks, only verified Pantaker metal dealers and sellers introduced through the community leader may use the pilot. "Proof of ownership" is reframed as **ownership/provenance evidence supplied by the parties and recorded by EcoSmart**. EcoSmart must not claim to determine guilt, guarantee ownership, or litigate disputes.
+
+### 6. How does the first transaction work, including rejection and liability?
+
+**Answer:**
+
+1. A community-referred seller and verified Pantaker metal dealer agree on pickup or drop-off. They decide who bears transport.
+2. The buyer pre-funds the transaction amount in the EcoSmart wallet before inspection.
+3. EcoSmart records both-party identity, material photos/video, declared weight, location, supplied provenance evidence, receipt/agreement, dealer inspection confirmation, and payment-release event.
+4. The buyer inspects the delivered material. On approval, EcoSmart releases the pre-funded money to the seller less a 4% commission on the transaction amount.
+5. On rejection, EcoSmart refunds the buyer's funded amount. The buyer bears ordinary transport cost, as the team says interviews confirm this is already their daily routine.
+6. EcoSmart reviews seller activity; repeat dishonest conduct can lead to blacklisting. Both parties sign terms and conditions. Parties may use the stored evidence for a dispute or report to law enforcement.
+
+**Safety rule selected:** **Custodial escrow, no EcoSmart fraud guarantee.** EcoSmart releases only buyer-funded money after buyer approval. It does not reimburse fraud losses. It preserves evidence, manages eligibility/suspension under its terms, and may direct parties to the appropriate legal or law-enforcement process.
+
+### 7. What happens if the product does not exist?
+
+**Answer:** The market remains constrained by fear of fraud, and recyclable waste may continue to be discarded instead of recycled. The team reports that fraud, non-delivery, stolen-goods disputes, or rejected deals occur daily.
+
+**Evidence gap:** "Daily" has no denominator. It is not yet known whether this means daily per dealer, daily across the 100-recycler community, or daily among all Pantaker transactions. The pilot must measure it before this claim is used externally.
+
+### 8. What makes the pilot pass or fail?
+
+**Six-week pilot scorecard supplied by the team:**
+
+| Measure | Threshold / target |
+| --- | ---: |
+| Verified metal dealers onboarded | 60 |
+| Community-referred sellers onboarded | 200 |
+| Completed, in-app funded transactions | 50 |
+| GMV | ₦1,000,000 |
+| Clean completions | 45 transactions, or 90% of 50 |
+| Dealers completing a second transaction | 30% |
+| Introduced users attempting to bypass the wallet | 5% |
+| Maximum EcoSmart fraud loss | ₦0 under the selected no-guarantee model |
+
+**Clarification:** The original response of "45" for clean completion means 45 transactions, not 45%. A 45% clean-completion rate would have made the product unsafe.
+
+**Pilot incident log required:** Record every relevant on- and off-platform incident with: anonymized dealer ID, seller ID, date/time, material, kilograms, value, transaction type, incident type (fraud, non-delivery, suspected stolen goods, rejection, price dispute, or other), evidence present, outcome, and whether the transaction was completed in EcoSmart.
+
+## Assumptions to test, not claims to repeat
+
+1. Community-referred sellers and Pantaker dealers will adopt a wallet and accept 4% commission. No direct willingness-to-pay evidence has been provided.
+2. Wallet use, identity checks, media, agreements, and a blacklist will make a dealer comfortable trading beyond an existing trust network.
+3. Buyers and sellers will not bypass the wallet after introduction. The proposed 5% target must be measured, not assumed.
+4. Smartphone/data access will not block useful adoption. This has not been tested.
+5. Recorded provenance evidence will reduce stolen-goods disputes. It can improve evidence, but it is not a guarantee of lawful ownership.
+6. The stated incident frequency is representative of the first customer segment. It currently lacks a denominator.
+7. Public resale prices will change dealer behavior enough to matter. This is a separate feature hypothesis, not the core initial promise.
+8. The original AI material-identification and valuation product is needed for the first wedge. It is not: defer it until the transaction workflow produces sufficient, consented, structured data and proves demand.
+9. The original month-six cost, CAC, GMV, and commission figures are supported. They are not yet tied to the six-week pilot or to observed conversion and must be rebuilt after the pilot.
+
+## Reframed problem statement
+
+Verified independent metal-scrap dealers in Pantaker, Phase 4, Kubwa cannot safely buy from new sellers outside their existing trust networks. They currently protect themselves by inspecting material in person and using receipts or written agreements, but this limits sourcing; paid-but-undelivered material and stolen-goods allegations can cause serious losses. They need a transaction workflow that allows inspection-before-release while preserving a credible handover and provenance record.
+
+## Reframed first customer
+
+**Buyer:** A verified independent metal-scrap dealer in Pantaker, Phase 4, Kubwa, Abuja, who buys scrap for resale to recycling companies.
+
+**Initial seller:** A seller introduced through the Pantaker community leader, not an unrestricted public marketplace participant.
+
+**First geography and material:** Kubwa/Pantaker metal scrap only. PET, households, SMEs, processors, nationwide expansion, AI identification, AI valuation, and broad price intelligence are deferred.
+
+## Reframed value proposition
+
+EcoSmart helps verified Pantaker metal-scrap dealers buy from community-referred new sellers without making blind payments. The buyer pre-funds the agreed amount, inspects the delivered material, and approves release; EcoSmart then pays the seller minus a 4% commission and retains a signed, time-stamped record of identities, material evidence, weight, location, supplied provenance documents, receipt/agreement, inspection, and payment release. If the buyer rejects delivery, their funded amount is refunded. EcoSmart provides escrow and an evidence trail, not a guarantee that goods are lawful or a guarantee against fraud loss.
+
+## What EcoSmart is not in the pilot
+
+- Not a marketplace for anyone with recyclable waste.
+- Not an AI valuation or material-identification product.
+- Not a price-stabilization service.
+- Not a buyer of waste or a closed PET-focused collection network.
+- Not an insurer, legal adjudicator, ownership guarantor, or litigant.
+
+## Real-world assignment before building further
+
+Run a six-week, community-leader-referred pilot with the scorecard above. Before writing an AI feature or opening the network, interview at least 10 verified Pantaker metal dealers using an exact 4% fee scenario and document: expected transaction value, whether they will pre-fund a wallet, what evidence would make them trust it, the maximum acceptable inspection delay, whether they would still pay the fee after one completed deal, and what would cause them to bypass the app. Start the incident log on day one.
+
+## Completion assessment
+
+**DONE_WITH_CONCERNS.** The initial problem, customer, workflow, and value proposition are now repeatable by a stranger. Adoption, 4% willingness to pay, incident frequency, legal-operational handling, and the effectiveness of the evidence trail remain unvalidated pilot hypotheses.
+
+---
+
+# Revised business plan: local generator-to-recycler marketplace
+
+Status: Product direction confirmed by the team. Generator demand, estate operations, and pricing remain unvalidated assumptions. This section supersedes the earlier **recycler-first, community-referred seller** plan for future discovery. It does not alter `locked-scope.md` or the requirements documents.
+
+## Revised problem
+
+Waste generators, including individuals, households, and SMEs, often do not know whether their materials are recyclable, what a recycler might pay, or which nearby recycler accepts them. They may wait for itinerant scavengers, call known collectors, or throw material away. Recyclers/aggregators want more direct supply from generators rather than relying only on scavengers and middlemen.
+
+## Revised product direction
+
+EcoSmart is an AI-assisted digital marketplace for recyclable-waste generators and recyclers. A generator scans, uploads, or manually selects a supported material. EcoSmart shows recyclability guidance, recycler-provided estimate ranges, recycling tips, and nearby verified recyclers that say they accept the material. A recycler declares accepted material categories and estimated buying prices, then receives matching requests from generators.
+
+The first pilot must not promise reliable AI classification for every item. Photo upload and manual selection are the safe fallback. If an item cannot be matched confidently to a supported material, the user selects a pilot material manually or sees "not supported in this pilot."
+
+## First local exchange loop
+
+**Location:** Dantata Estate, near Pantaker/Kubwa, Abuja, subject to estate-manager coordination.
+
+**Buyer side:** A small group of nearby verified recyclers/aggregators that want more direct supply.
+
+**Generator side:** Dantata Estate residents. This cohort replaces the previously suggested SME-first cohort.
+
+**First materials:** cardboard, PET plastic bottles, aluminium, brass, and glass. E-waste, appliances, phones, laptops, batteries, cars, and other unlisted scrap remain out of the first catalogue unless a recycler explicitly accepts them in a later pilot.
+
+**Recycler reason to participate:** More direct supply from households and SMEs, with the potential for better margins and less reliance on scavengers or middlemen.
+
+**Generator promise:** Sell waste, clear space, and recycle responsibly through an estimate of potential value, recycler contact, and a convenient local handover process.
+
+## Listing, collection, inspection, and payment workflow
+
+1. A resident scans/uploads an item or manually selects a supported material.
+2. EcoSmart shows recyclability guidance, recycler-provided estimates, tips, and recyclers that accept the selected material.
+3. The resident selects a recycler and creates a listing.
+4. EcoSmart gives the resident a transaction code or label. The resident places material in a separately identified bag or bundle.
+5. The resident drops the tagged bundle at a Dantata Estate management-operated collection point.
+6. A recycler collects individual tagged bundles on an agreed schedule. EcoSmart does not collect, store, or take possession of material.
+7. The recycler inspects and weighs each individual bundle, then enters a final in-app offer.
+8. The resident accepts or rejects the final offer in EcoSmart.
+9. Only after resident acceptance does the app wallet release payment to the resident. No payment is made for a rejected offer.
+
+## Price and revenue decisions
+
+- Recycler-posted prices are estimates only. They help a generator choose whom to contact; they are not a binding final price.
+- The recycler may change the final price after inspection and weighing.
+- The resident must accept the final price before payment is released.
+- The initial exchange pilot is free for both sides.
+- A future, untested revenue hypothesis is a 4% total fee split 3:1 between buyer/recycler and seller/generator, applied only after accepted payment. This is not a pilot rule.
+
+## Estate collection-point operating boundary
+
+- Dantata Estate management operates the designated collection point.
+- EcoSmart coordinates the digital listing, matching, transaction label, estimate, final offer, payment, and record.
+- Recyclers handle their own collection and material acceptance.
+- Before launch, estate management must agree on the location, allowed materials, holding period, cleanliness, rejected-material process, and communication to residents.
+
+## Current decisions
+
+| Decision | Outcome |
+| --- | --- |
+| Marketplace shape | Local two-sided generator-to-recycler exchange loop |
+| First cohort | Dantata Estate residents and nearby recyclers/aggregators |
+| Generator acquisition | Estate cohort before schools, SMEs, and marketplaces |
+| Supported materials | Cardboard, PET bottles, aluminium, brass, glass |
+| Item input | Scan/upload plus manual selection fallback |
+| Unsupported item | Manual selection from pilot catalogue or "not supported in this pilot" |
+| Price model | Recycler estimate first; final offer after recycler inspection and weighing |
+| Payment rule | Resident accepts final offer before wallet release |
+| Collection model | Individual tagged bundles at estate-managed collection point |
+| Pilot pricing | Free for buyer and seller |
+| Future fee hypothesis | 4% total, 3:1 buyer/seller split, untested |
+
+## Assumptions and evidence gaps
+
+1. Dantata Estate management will approve and operate a collection point under clear operating rules.
+2. Estate residents will create listings, tag materials, and bring them to a collection point.
+3. Nearby recyclers will publish estimate ranges, collect tagged bundles, inspect them promptly, and submit final offers.
+4. The five first materials will accumulate in worthwhile quantities for recycler collection.
+5. Residents will accept the final-offer step when it differs from the estimate.
+6. Photo upload/manual selection is sufficient for the first pilot; AI classification is not validated.
+7. A future 3:1 buyer/seller fee split will be acceptable after free pilot usage is proven.
+
+## Scope status
+
+The updated business direction conflicts with the earlier locked recycler-first requirements and scope. Those implementation documents remain locked and must not be treated as the new build plan until the team explicitly unlocks them and produces revised requirements from this section.
+
+---
+
+# Revised business plan v2: free open generator marketplace
+
+Status: This is the current business rule and supersedes the Dantata Estate cohort restriction in the preceding revised plan.
+
+## Scope reversal
+
+EcoSmart will operate as a free, open marketplace for waste generators. Individuals, households, and small or medium-sized businesses may onboard without being limited to Dantata Estate or another named pilot cohort. The first pilot remains free for generators and recyclers. The earlier Dantata Estate collection-point model is no longer a launch dependency.
+
+## Current marketplace model
+
+1. A waste generator creates an account and scans, uploads, or manually selects a supported material.
+2. EcoSmart shows recyclability guidance, recycler-provided estimated prices, recycling tips, and nearby verified recyclers that accept the material.
+3. The generator selects a recycler and creates a listing with a preferred pickup or drop-off arrangement.
+4. The recycler accepts the request and the parties agree the practical handover details through the app's contact tools.
+5. The recycler inspects and weighs the material at handover, then enters a final in-app offer.
+6. The generator accepts or rejects the final offer before any money moves.
+7. On acceptance, EcoSmart releases free pilot wallet payment to the generator. On rejection, no payout occurs.
+
+## Current rules
+
+- All waste-generator types may onboard: individuals, households, and SMEs.
+- Recyclers remain verified and declare accepted materials plus non-binding estimated buying prices.
+- The initial supported-material catalogue remains cardboard, PET plastic bottles, aluminium, brass, and glass.
+- Scan/upload is an intake aid only. Manual material selection and recycler inspection remain the fallback and final check.
+- Recycler estimates are not final prices. The recycler supplies a final offer after inspection and weighing; the generator must accept it before payout.
+- The pilot is free for both sides. The future 3:1 buyer/seller fee split remains an untested later hypothesis only.
+- Pickup or drop-off is agreed between the matched generator and recycler. EcoSmart does not collect, store, transport, or take possession of waste.
+
+## Superseded decisions
+
+- Dantata Estate is no longer the sole generator cohort or required first launch location.
+- Estate management does not operate a required collection point for the open marketplace.
+- Individual tagged-bundle collection-point flow is optional for future partners, not a core launch requirement.
+
+## Open-market assumptions to test
+
+1. Open generator onboarding produces enough useful listings without overwhelming recycler response capacity.
+2. Nearby verified recyclers will accept or respond to requests quickly enough to create a useful generator experience.
+3. Generators will complete a pickup or drop-off arrangement after viewing estimates and recycler information.
+4. The five supported materials are sufficient for early generator demand.
+5. Generators will accept inspection-based final offers when those differ from displayed estimates.
+6. Free pilot transactions create enough repeat behaviour to later test the proposed fee model.

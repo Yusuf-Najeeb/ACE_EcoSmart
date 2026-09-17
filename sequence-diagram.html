@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EcoSmart Open Marketplace Sequence Diagrams</title>
+  <style>
+    :root { --ink:#17312a; --muted:#52675f; --paper:#fbfdfb; --line:#dce7e0; --green:#16714e; --mint:#e9f6ef; --code:#112a22; }
+    * { box-sizing:border-box; } body { margin:0; background:#f1f6f3; color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:1040px; margin:40px auto; padding:40px; background:var(--paper); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 30px rgba(28,67,49,.08); }
+    h1,h2 { line-height:1.2; } h1 { margin:0 0 24px; font-size:2rem; } h2 { margin-top:38px; padding-top:18px; border-top:1px solid var(--line); font-size:1.35rem; }
+    pre { overflow:auto; margin:16px 0; padding:20px; border-radius:10px; background:var(--code); color:#e9f6ef; font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre; }
+    ul { padding-left:1.4rem; } li { margin:8px 0; } .note { color:var(--muted); } code { background:var(--mint); padding:2px 5px; border-radius:4px; }
+    @media (max-width:640px) { main { margin:0; padding:24px 18px; border-radius:0; } h1 { font-size:1.65rem; } pre { margin-left:-4px; margin-right:-4px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>EcoSmart Open Marketplace Sequence Diagrams</h1>
+    <p class="note">The Mermaid source below shows how information moves among the users, app, server/database, email service, and wallet/payment provider.</p>
+
+    <h2>Main flow: verified recycler, generator listing, and funded final-offer payout</h2>
+    <pre class="mermaid">sequenceDiagram
+    autonumber
+    actor Generator as User: Waste generator
+    actor Recycler as User: Recycler
+    actor Admin as User: EcoSmart administrator
+    participant App as Screen/App
+    participant Server as Server
+    database DB as Server/Database
+    participant Email as Email service
+    participant Pay as Wallet/Payment provider
+
+    Recycler-&gt;&gt;App: Create recycler account; submit verification details and area
+    App-&gt;&gt;Server: Submit recycler application
+    Server-&gt;&gt;DB: Save profile as Pending approval
+    Admin-&gt;&gt;App: Review and approve recycler profile
+    App-&gt;&gt;Server: Approve profile
+    Server-&gt;&gt;DB: Set status to Verified
+    Recycler-&gt;&gt;App: Set accepted materials, price/unit, and availability
+    App-&gt;&gt;Server: Save catalogue and availability
+    Server-&gt;&gt;DB: Store recycler matching details
+
+    Generator-&gt;&gt;App: Create account; submit name and email
+    App-&gt;&gt;Server: Request email verification
+    Server-&gt;&gt;Email: Send one-time email code
+    Email--&gt;&gt;Generator: Deliver email code
+    Generator-&gt;&gt;App: Enter code and area/neighbourhood
+    App-&gt;&gt;Server: Verify and save profile
+    Server-&gt;&gt;DB: Save verified generator email and area
+    Generator-&gt;&gt;App: Scan/upload item or choose material
+    App-&gt;&gt;Server: Submit intake and area
+    Server-&gt;&gt;DB: Check catalogue and guidance
+    DB--&gt;&gt;Server: Supported material and recycling tip
+    Server--&gt;&gt;App: Show guidance
+
+    Generator-&gt;&gt;App: Request matching recyclers
+    App-&gt;&gt;Server: Send selected material and area
+    Server-&gt;&gt;DB: Find Verified + Available recyclers matching area/material
+    DB--&gt;&gt;Server: Profiles, estimates, units, availability
+    Server--&gt;&gt;App: Return matching recyclers
+    Generator-&gt;&gt;App: Select recycler and create listing
+    App-&gt;&gt;Server: Create listing for selected recycler only
+    Server-&gt;&gt;DB: Save listing as Sent to recycler
+    Recycler-&gt;&gt;App: Accept request and agree handover
+    App-&gt;&gt;Server: Record response and arrangement
+    Server-&gt;&gt;DB: Save acceptance and timestamp
+    Server--&gt;&gt;App: Reveal approved contact details
+    opt Matched parties use optional in-app chat
+        Generator-&gt;&gt;App: Send message about active listing
+        App-&gt;&gt;Server: Save and deliver message
+        Server-&gt;&gt;DB: Store message against listing
+        Server--&gt;&gt;App: Deliver message to recycler
+    end
+    opt Matched parties start optional in-app call
+        Generator-&gt;&gt;App: Start call for active listing
+        App--&gt;&gt;Recycler: Present call invitation
+    end
+    Note over Generator,Recycler: Direct pickup/drop-off occurs outside EcoSmart.
+
+    Recycler-&gt;&gt;App: Record actual weight and final amount
+    App-&gt;&gt;Server: Create pending final offer
+    Server-&gt;&gt;Pay: Fund exact final-offer amount
+    Pay--&gt;&gt;Server: Funding confirmed
+    Server-&gt;&gt;DB: Save funded offer and 24-hour expiry
+    Server--&gt;&gt;App: Show final offer to generator
+    Generator-&gt;&gt;App: Accept final offer
+    App-&gt;&gt;Server: Record acceptance
+    Server-&gt;&gt;Pay: Release full amount to generator
+    Pay--&gt;&gt;Server: Payout confirmed
+    Server-&gt;&gt;DB: Mark Completed; no commission
+    Server--&gt;&gt;App: Show time-stamped record
+
+    Admin-&gt;&gt;App: Manage materials, profiles, and records
+    App-&gt;&gt;Server: Save change or retrieve records
+    Server-&gt;&gt;DB: Update catalogue/profile or return records</pre>
+
+    <h2>Exception flow: unsupported or uncertain material intake</h2>
+    <pre class="mermaid">sequenceDiagram
+    autonumber
+    actor Generator as User: Waste generator
+    participant App as Screen/App
+    participant Server as Server
+    database DB as Server/Database
+
+    Generator-&gt;&gt;App: Scan or upload an item
+    App-&gt;&gt;Server: Submit image for pilot material intake
+    Server-&gt;&gt;DB: Compare against supported catalogue
+    DB--&gt;&gt;Server: No confident supported-material match
+    Server--&gt;&gt;App: Return manual-selection fallback
+    App--&gt;&gt;Generator: Ask generator to choose a supported material
+    alt Generator chooses a supported material
+        Generator-&gt;&gt;App: Select material manually
+        App-&gt;&gt;Server: Save selected material
+        Server-&gt;&gt;DB: Record intake attempt and selection
+        Server--&gt;&gt;App: Show guidance and continue to matching
+    else Generator cannot choose a supported material
+        Server--&gt;&gt;App: Return Not supported in this pilot
+        App--&gt;&gt;Generator: Show unsupported-item outcome; no listing
+        Server-&gt;&gt;DB: Record unsupported intake attempt
+    end</pre>
+
+    <h2>Other required decision outcomes</h2>
+    <ul>
+      <li>If the selected recycler declines, the generator sees other matching recyclers; the listing is not broadcast automatically.</li>
+      <li>If the generator rejects a funded final offer, or does not respond within 24 hours, the server records <code>Rejected</code> or <code>Expired</code> and makes no payout.</li>
+      <li>Recycler prices are estimates only; the funded final offer after inspection is what the generator accepts or rejects.</li>
+      <li>Price history and in-app calls are later optional features. Universal AI identification, unsupported materials, commissions, waste transport/storage, and ownership/dispute decisions are outside this pilot.</li>
+    </ul>
+    <p class="note">Coverage: FR-01–FR-17 are represented in the main and exception diagrams; FR-18 is the optional chat exchange in the Markdown diagram; FR-19–FR-21 are explicitly recorded above.</p>
+  </main>
+</body>
+</html>

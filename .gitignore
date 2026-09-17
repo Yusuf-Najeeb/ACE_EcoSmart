@@ -1,0 +1,9 @@
+.env
+local.env
+*.env
+.env.*
+!.env.example
+data/
+node_modules/
+*.log
+.gstack/

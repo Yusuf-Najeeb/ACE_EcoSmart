@@ -1,0 +1,12 @@
+{
+  "name": "ecosmart-registration",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env --env-file-if-exists=local.env server.js",
+    "test": "node --test",
+    "create-admin": "node scripts/create-admin.js"
+  }
+}

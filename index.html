@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoSmart — Open Marketplace for Recyclables</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"></path>
+            <path d="M11 19h8.2a1.8 1.8 0 0 0 1.57-2.665L17.2 10.5"></path>
+            <path d="M9.1 4.5l3.25 5.5h6.15"></path>
+            <path d="m14 2 3 3-3 3"></path>
+            <path d="m2 14 3-3 3 3"></path>
+            <path d="m20 10-3 3-3-3"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Eco<span class="brand-highlight">Smart</span></span>
+          <span class="brand-tagline">Open Marketplace</span>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button id="inspect-db-btn" class="btn-ghost" title="Inspect persistent data records">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+          <span>Data Store</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Incoming SMS Notification Toast Simulation -->
+  <aside id="sms-toast" class="sms-notification-toast" aria-live="polite" hidden>
+    <div class="sms-toast-header">
+      <div class="sms-sender">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>SMS from <strong>EcoSmart</strong></span>
+      </div>
+      <span class="sms-time" id="sms-timestamp">Just now</span>
+    </div>
+    <div class="sms-toast-body">
+      <p id="sms-message-text">Your EcoSmart verification code is: <strong id="sms-code-display">------</strong>. Valid for 3 minutes.</p>
+    </div>
+    <div class="sms-toast-footer">
+      <button id="sms-autofill-btn" class="btn-text-action">Auto-fill Code</button>
+      <button id="sms-dismiss-btn" class="btn-icon-dismiss" aria-label="Dismiss">&times;</button>
+    </div>
+  </aside>
+
+  <!-- Main Content Container -->
+  <main class="main-layout">
+    <!-- SCREEN 1: Account Entry & Phone Verification -->
+    <section id="screen-1" class="screen-container active">
+      <div class="screen-card">
+        <!-- Page Title & Subhead -->
+        <div class="card-header">
+          <div class="badge-feature">Screen 1 &bull; FR-01</div>
+          <h1 class="card-title">Create your account</h1>
+          <p class="card-description">Join EcoSmart's open marketplace to trade recyclable materials directly with verified partners.</p>
+        </div>
+
+        <!-- Stage 1: Role Selection & Account Details -->
+        <form id="registration-form" class="flow-form" novalidate>
+          <!-- 1. Role Selector -->
+          <div class="form-group role-selection-group">
+            <label class="group-label">Select your role <span class="required-star">*</span></label>
+            <div class="role-grid">
+              <label class="role-card" for="role-generator">
+                <input type="radio" name="role" id="role-generator" value="generator" checked>
+                <div class="role-card-inner">
+                  <div class="role-icon-wrapper role-generator-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                  </div>
+                  <div class="role-info">
+                    <div class="role-title">I have recyclable waste</div>
+                    <div class="role-subtitle">Waste Generator (Individual, Household, or SME)</div>
+                  </div>
+                  <div class="role-radio-mark"></div>
+                </div>
+              </label>
+
+              <label class="role-card" for="role-recycler">
+                <input type="radio" name="role" id="role-recycler" value="recycler">
+                <div class="role-card-inner">
+                  <div class="role-icon-wrapper role-recycler-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                  <div class="role-info">
+                    <div class="role-title">I buy recyclable waste</div>
+                    <div class="role-subtitle">Recycler / Aggregator</div>
+                  </div>
+                  <div class="role-radio-mark"></div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Account Details Fields -->
+          <div id="details-section" class="details-section">
+            <!-- 2. Full-name input -->
+            <div class="form-group">
+              <label for="fullname-input" class="form-label">Full name <span class="required-star">*</span></label>
+              <div class="input-container">
+                <input 
+                  type="text" 
+                  id="fullname-input" 
+                  name="fullname" 
+                  class="form-input" 
+                  placeholder="e.g. Amina Bello or Green Earth Ventures" 
+                  autocomplete="name" 
+                  required
+                >
+                <div class="input-status-icon" aria-hidden="true"></div>
+              </div>
+              <div class="form-error-msg" id="fullname-error"></div>
+            </div>
+
+            <!-- 3. Phone-number input -->
+            <div class="form-group">
+              <label for="phone-input" class="form-label">Phone number <span class="required-star">*</span></label>
+              <div class="input-container phone-input-container">
+                <span class="phone-prefix">+234</span>
+                <input 
+                  type="tel" 
+                  id="phone-input" 
+                  name="phone" 
+                  class="form-input phone-field" 
+                  placeholder="0801 234 5678" 
+                  autocomplete="tel" 
+                  required
+                >
+                <div class="input-status-icon" aria-hidden="true"></div>
+              </div>
+              <span class="input-hint">We will send a one-time SMS verification code to this number.</span>
+              <div class="form-error-msg" id="phone-error"></div>
+            </div>
+
+            <!-- 4. Area/neighbourhood input -->
+            <div class="form-group">
+              <label for="area-input" class="form-label">Area / Neighbourhood <span class="required-star">*</span></label>
+              <div class="input-container">
+                <input 
+                  type="text" 
+                  id="area-input" 
+                  name="area" 
+                  class="form-input" 
+                  placeholder="e.g. Ikeja, Lekki Phase 1, Surulere, Yaba" 
+                  autocomplete="address-level2" 
+                  list="area-suggestions"
+                  required
+                >
+                <datalist id="area-suggestions">
+                  <option value="Ikeja, Lagos"></option>
+                  <option value="Lekki Phase 1, Lagos"></option>
+                  <option value="Victoria Island, Lagos"></option>
+                  <option value="Yaba, Lagos"></option>
+                  <option value="Surulere, Lagos"></option>
+                  <option value="Festac Town, Lagos"></option>
+                  <option value="Garki, Abuja"></option>
+                  <option value="Wuse II, Abuja"></option>
+                  <option value="Maitama, Abuja"></option>
+                  <option value="Port Harcourt Central"></option>
+                </datalist>
+                <div class="input-status-icon" aria-hidden="true"></div>
+              </div>
+              <span class="input-hint">Used for matching with nearby recyclers or generators.</span>
+              <div class="form-error-msg" id="area-error"></div>
+            </div>
+
+            <!-- 5. Continue button -->
+            <div class="form-actions">
+              <button type="button" id="continue-btn" class="btn-primary btn-block">
+                <span>Continue</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stage 2: SMS Verification Form (revealed after Continue) -->
+          <div id="sms-section" class="sms-section hidden">
+            <div class="sms-divider"></div>
+
+            <div class="sms-header-info">
+              <div class="sms-icon-badge">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </div>
+              <div class="sms-header-text">
+                <h2 class="sms-title">Verify your phone number</h2>
+                <p class="sms-desc">Enter the 6-digit code sent to <strong id="display-phone-number">+234 ...</strong></p>
+              </div>
+              <button type="button" id="edit-phone-btn" class="btn-link-edit" title="Change phone number">Change</button>
+            </div>
+
+            <!-- 6-Digit Pin Input -->
+            <div class="form-group otp-group">
+              <label for="otp-1" class="form-label center-label">Enter 6-digit SMS code <span class="required-star">*</span></label>
+              <div class="otp-inputs" id="otp-container">
+                <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" id="otp-1" data-index="0" autocomplete="one-time-code" required>
+                <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" id="otp-2" data-index="1" required>
+                <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" id="otp-3" data-index="2" required>
+                <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" id="otp-4" data-index="3" required>
+                <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" id="otp-5" data-index="4" required>
+                <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" id="otp-6" data-index="5" required>
+              </div>
+              <div class="form-error-msg center-error" id="otp-error"></div>
+            </div>
+
+            <!-- Expiry & Resend Mechanism -->
+            <div class="otp-timer-row">
+              <span class="timer-text" id="otp-timer-display">Code expires in: <strong id="timer-countdown">03:00</strong></span>
+              <button type="button" id="resend-code-btn" class="btn-link" disabled>Resend code</button>
+            </div>
+
+            <!-- 6. Verify Phone Button -->
+            <div class="form-actions">
+              <button type="button" id="verify-phone-btn" class="btn-primary btn-block">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>Verify phone</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- SCREEN 3 PREVIEW: Generator Destination ("Check my waste") -->
+    <section id="screen-3-preview" class="screen-container hidden">
+      <div class="screen-card destination-card">
+        <div class="destination-header">
+          <div class="badge-success">Account Verified &bull; FR-01 Complete</div>
+          <div class="role-pill generator-pill">Waste Generator</div>
+        </div>
+
+        <div class="success-banner">
+          <div class="success-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="success-content">
+            <h2>Welcome to EcoSmart, <span id="gen-user-name">User</span>!</h2>
+            <p>Your generator account is active and your phone number is verified.</p>
+          </div>
+        </div>
+
+        <div class="account-summary-box">
+          <h3>Account Profile</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">User ID</span>
+              <span class="summary-value" id="gen-user-id">usr_...</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Role</span>
+              <span class="summary-value">Generator (Individual / SME)</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Phone</span>
+              <span class="summary-value" id="gen-user-phone">+234...</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Area / Neighbourhood</span>
+              <span class="summary-value" id="gen-user-area">Lagos</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Verification Status</span>
+              <span class="summary-badge status-verified">Verified via SMS</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Account Status</span>
+              <span class="summary-badge status-active">Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Screen Teaser -->
+        <div class="next-step-box">
+          <div class="next-step-title">
+            <span class="step-num">Next</span>
+            <h4>Screen 3: Check my waste</h4>
+          </div>
+          <p>You can now scan, upload photo, or manually select recyclable materials (Cardboard, PET bottles, Aluminium, Brass, Glass) to find nearby verified recyclers.</p>
+        </div>
+
+        <div class="card-footer-actions">
+          <button id="gen-reset-btn" class="btn-secondary">Create Another Account</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2 PREVIEW: Recycler Destination ("Recycler verification application") -->
+    <section id="screen-2-preview" class="screen-container hidden">
+      <div class="screen-card destination-card">
+        <div class="destination-header">
+          <div class="badge-warning">Phone Verified &bull; Next: Profile Submission</div>
+          <div class="role-pill recycler-pill">Recycler / Aggregator</div>
+        </div>
+
+        <div class="success-banner warning-theme">
+          <div class="success-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="success-content">
+            <h2>Welcome to EcoSmart, <span id="rec-user-name">Recycler</span>!</h2>
+            <p>Your phone is verified. Complete your recycler profile to receive listings and make offers.</p>
+          </div>
+        </div>
+
+        <div class="account-summary-box">
+          <h3>Recycler Profile</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">User ID</span>
+              <span class="summary-value" id="rec-user-id">usr_...</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Role</span>
+              <span class="summary-value">Recycler / Aggregator</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Phone</span>
+              <span class="summary-value" id="rec-user-phone">+234...</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Operating Area</span>
+              <span class="summary-value" id="rec-user-area">Lagos</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Phone Verification</span>
+              <span class="summary-badge status-verified">Verified via SMS</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Recycler Status</span>
+              <span class="summary-badge status-pending">Pending Recycler Approval</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Screen Teaser -->
+        <div class="next-step-box">
+          <div class="next-step-title">
+            <span class="step-num">Next</span>
+            <h4>Screen 2: Recycler verification application</h4>
+          </div>
+          <p>Submit your Government ID, business registration/licence details, and photo for administrator approval before receiving generator listings.</p>
+        </div>
+
+        <div class="card-footer-actions">
+          <button id="rec-reset-btn" class="btn-secondary">Create Another Account</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Database & Audit Inspector Modal -->
+  <div id="inspector-modal" class="modal-overlay hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+          <h3>EcoSmart Live Data Store (`localStorage`)</h3>
+        </div>
+        <button id="close-modal-btn" class="btn-icon-dismiss">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">Live records adhering strictly to <code>data-structure.md</code> Section 1 (User account) and Section 2 (Phone verification).</p>
+        
+        <div class="inspector-tabs">
+          <button class="tab-btn active" data-tab="users-tab">User Accounts (<span id="user-count-badge">0</span>)</button>
+          <button class="tab-btn" data-tab="verifications-tab">Phone Verifications (<span id="pv-count-badge">0</span>)</button>
+        </div>
+
+        <div id="users-tab" class="tab-content active">
+          <pre id="users-json-view">Loading...</pre>
+        </div>
+
+        <div id="verifications-tab" class="tab-content">
+          <pre id="pv-json-view">Loading...</pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="clear-db-btn" class="btn-danger-outline">Clear All Local Data</button>
+        <button id="close-inspector-btn" class="btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>EcoSmart Open Marketplace Pilot &bull; FR-01: Role-based account registration &amp; SMS verification</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
