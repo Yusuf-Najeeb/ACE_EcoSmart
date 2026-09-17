@@ -37,6 +37,27 @@ export function sameArea(a, b) {
   return false;
 }
 
+export function isAllowedOrigin(req, configuredOrigin) {
+  const reqOrigin = req.headers.origin;
+  if (!reqOrigin) return true;
+  if (configuredOrigin && reqOrigin === configuredOrigin) return true;
+  if (process.env.APP_ORIGIN && reqOrigin === process.env.APP_ORIGIN.replace(/\/+$/, '')) return true;
+
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  if (host) {
+    const cleanHost = host.split(':')[0].toLowerCase();
+    try {
+      const parsed = new URL(reqOrigin);
+      const originHost = parsed.host.toLowerCase();
+      const originHostname = parsed.hostname.toLowerCase();
+      if (originHost === host.toLowerCase() || originHostname === cleanHost) {
+        return true;
+      }
+    } catch {}
+  }
+  return false;
+}
+
 export function validate(input) {
   if (!['generator', 'recycler'].includes(input.role)) throw new AppError(400, 'Choose whether you have or buy recyclable waste.');
   const name = typeof input.name === 'string' ? input.name.trim().replace(/\s+/g, ' ') : '';
@@ -396,7 +417,7 @@ export function createApp({ dbPath = resolve(root, 'data/ecosmart.sqlite'), prov
         return json(200, { ok: true, material: mat, matches });
       }
       if (req.method === 'POST' && path.startsWith('/api/')) {
-        if (req.headers.origin !== origin) throw new AppError(403, 'Request origin is not allowed. Refresh this page and try again.');
+        if (!isAllowedOrigin(req, origin)) throw new AppError(403, 'Request origin is not allowed. Refresh this page and try again.');
         const input = await body(req);
         if (!['/api/chat/messages', '/api/call/status'].includes(path)) {
           rate(`ip:${req.socket.remoteAddress}`, 10000, 3600000);
