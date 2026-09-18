@@ -221,7 +221,7 @@ export function createApp({ dbPath = getDatabasePath(), provider = createEmailPr
   }
 
   function getUserPayload(user) {
-    if (!user) return { materials: [], materialSettings: [], intakes: [], listings: [], incomingRequests: [], wallet: null, bankAccount: null, walletTransactions: [], lifetimeTotal: 0 };
+    if (!user) return { materials: [], materialSettings: [], intakes: [], listings: [], incomingRequests: [], wallet: null, bankAccount: null, walletTransactions: [], lifetimeTotal: 0, paymentsActive: demoPayments };
     let recyclerApplication = null;
     let materials = [];
     let materialSettings = [];
@@ -320,7 +320,8 @@ export function createApp({ dbPath = getDatabasePath(), provider = createEmailPr
       wallet,
       bankAccount,
       walletTransactions,
-      lifetimeTotal
+      lifetimeTotal,
+      paymentsActive: demoPayments
     };
   }
 
@@ -1327,7 +1328,7 @@ export function createApp({ dbPath = getDatabasePath(), provider = createEmailPr
           if (app.user_id === user.id) throw new AppError(403, 'Administrators cannot review their own application.');
 
           const isApproval = decision === 'approved';
-          const dbStatus = isApproval ? 'approved' : 'rejected';
+          const dbStatus = decision;
           const userAccountStatus = isApproval ? 'active' : (decision === 'suspended' ? 'suspended' : 'rejected');
           const defaultNote = isApproval 
             ? 'Verified by administrator.' 
@@ -1370,7 +1371,9 @@ export function createApp({ dbPath = getDatabasePath(), provider = createEmailPr
             total: applications.length,
             pending: applications.filter(a => a.status === 'pending').length,
             approved: applications.filter(a => a.status === 'approved').length,
-            rejected: applications.filter(a => a.status === 'rejected').length
+            rejected: applications.filter(a => a.status === 'rejected').length,
+            suspended: applications.filter(a => a.status === 'suspended').length,
+            revoked: applications.filter(a => a.status === 'revoked').length
           };
           return json(200, { ok: true, applications, stats });
         }

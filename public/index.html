@@ -581,6 +581,23 @@
 
         <div class="divider"></div>
 
+        <!-- Incoming Generator Requests List -->
+        <div class="incoming-requests-section">
+          <div class="section-heading-row">
+            <h3>Incoming Generator Requests</h3>
+            <span class="count-pill" id="incoming-requests-count-pill">0 requests</span>
+          </div>
+          <div id="incoming-requests-list" class="incoming-requests-list">
+            <div class="empty-state-box">
+              <div class="empty-icon">📬</div>
+              <h4>No incoming requests yet</h4>
+              <p class="muted">When nearby generators select you for their recyclable waste, requests will appear here for review and handover arrangement.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
         <!-- Materials & Non-binding Estimates Setup -->
         <div class="materials-section">
           <div class="section-heading-row">
@@ -601,23 +618,6 @@
               <span id="save-status-msg" class="save-status" hidden>✓ Saved successfully</span>
             </div>
           </form>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Incoming Generator Requests List -->
-        <div class="incoming-requests-section">
-          <div class="section-heading-row">
-            <h3>Incoming Generator Requests</h3>
-            <span class="count-pill" id="incoming-requests-count-pill">0 requests</span>
-          </div>
-          <div id="incoming-requests-list" class="incoming-requests-list">
-            <div class="empty-state-box">
-              <div class="empty-icon">📬</div>
-              <h4>No incoming requests yet</h4>
-              <p class="muted">When nearby generators select you for their recyclable waste, requests will appear here for review and handover arrangement.</p>
-            </div>
-          </div>
         </div>
 
         <div class="divider"></div>
@@ -924,6 +924,10 @@
                 <strong id="screen7-breakdown-offer">₦0.00</strong>
               </div>
               <div class="funding-row">
+                <span>Effective Unit Rate:</span>
+                <strong id="screen7-breakdown-rate" style="color: #245c43;">₦0.00 / kg</strong>
+              </div>
+              <div class="funding-row">
                 <span>Platform Commission Fee (Pilot):</span>
                 <span class="commission-free">₦0.00 (0% Free Pilot)</span>
               </div>
@@ -955,6 +959,10 @@
               <div class="metric-item">
                 <span class="metric-label">Verified Weight:</span>
                 <strong class="metric-val" id="screen7-verified-weight">0 kg</strong>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Offered Unit Rate:</span>
+                <strong class="metric-val" id="screen7-verified-rate">₦0 / kg</strong>
               </div>
               <div class="metric-item">
                 <span class="metric-label">Recycler Grade / Note:</span>
@@ -1080,6 +1088,8 @@
               <button type="button" class="filter-pill" data-filter="pending" id="filter-apps-pending">Pending (<span id="apps-count-pending">0</span>)</button>
               <button type="button" class="filter-pill" data-filter="approved" id="filter-apps-approved">Approved (<span id="apps-count-approved">0</span>)</button>
               <button type="button" class="filter-pill" data-filter="rejected" id="filter-apps-rejected">Rejected (<span id="apps-count-rejected">0</span>)</button>
+              <button type="button" class="filter-pill" data-filter="suspended" id="filter-apps-suspended">Suspended (<span id="apps-count-suspended">0</span>)</button>
+              <button type="button" class="filter-pill" data-filter="revoked" id="filter-apps-revoked">Revoked (<span id="apps-count-revoked">0</span>)</button>
             </div>
           </div>
 
@@ -1247,10 +1257,10 @@
       </div>
 
       <!-- MODAL: Wallet Top-Up (Recycler) -->
-      <div id="wallet-topup-modal" class="wallet-modal-backdrop" hidden>
+      <div id="wallet-topup-modal" class="wallet-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="topup-modal-title" hidden>
         <div class="wallet-modal-card">
           <div class="wallet-modal-header">
-            <h4>Add Demo Wallet Credit</h4>
+            <h4 id="topup-modal-title">Add Demo Wallet Credit</h4>
             <button type="button" class="btn-close-modal" id="btn-close-topup-modal" title="Close">✕</button>
           </div>
           <form id="wallet-topup-form" class="wallet-modal-body">
@@ -1289,14 +1299,14 @@
       </div>
 
       <!-- MODAL: Bank Account Setup (Generator & Recycler) -->
-      <div id="wallet-bank-modal" class="wallet-modal-backdrop" hidden>
+      <div id="wallet-bank-modal" class="wallet-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="bank-modal-title" hidden>
         <div class="wallet-modal-card">
           <div class="wallet-modal-header">
-            <h4>🏦 Link Nigerian Bank Account</h4>
+            <h4 id="bank-modal-title">🏦 Link Nigerian Bank Account</h4>
             <button type="button" class="btn-close-modal" id="btn-close-bank-modal" title="Close">✕</button>
           </div>
           <form id="wallet-bank-form" class="wallet-modal-body">
-            <p class="muted" style="font-size: 13px; margin: 0 0 12px;">Save bank details for later use. Bank verification and real withdrawals are not available yet.</p>
+            <p class="muted" style="font-size: 13px; margin: 0 0 12px;">Save bank details for manual settlements. Automated NUBAN verification is not active yet.</p>
             
             <label for="bank-code-select">Select Bank <span class="req">*</span></label>
             <select id="bank-code-select" required>
@@ -1324,7 +1334,7 @@
             <input type="text" id="bank-account-name" placeholder="Enter account holder name" required style="background: #f1f6f3; color: #164e33; font-weight: 700;">
 
             <div class="verified-bank-badge-row" id="bank-verified-indicator" hidden>
-              <span class="badge badge-approved">✓ Bank details saved — not verified</span>
+              <span class="badge" style="background: #eef7f2; color: #1b4d3e; border: 1px solid #b7dfca;">ℹ Bank details saved (unverified — settlements processed manually)</span>
             </div>
 
             <button type="submit" class="primary" id="btn-save-bank-account" style="margin-top: 16px;">Save Bank Details <span aria-hidden="true">→</span></button>
@@ -1333,10 +1343,10 @@
       </div>
 
       <!-- MODAL: Withdrawal / Cash Out (Generator & Recycler) -->
-      <div id="wallet-withdraw-modal" class="wallet-modal-backdrop" hidden>
+      <div id="wallet-withdraw-modal" class="wallet-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="withdraw-modal-title" hidden>
         <div class="wallet-modal-card">
           <div class="wallet-modal-header">
-            <h4>Demo Withdrawal</h4>
+            <h4 id="withdraw-modal-title">Demo Withdrawal</h4>
             <button type="button" class="btn-close-modal" id="btn-close-withdraw-modal" title="Close">✕</button>
           </div>
           <form id="wallet-withdraw-form" class="wallet-modal-body">

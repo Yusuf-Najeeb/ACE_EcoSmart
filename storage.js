@@ -36,6 +36,53 @@ export function openStorage(dbPath) {
     finally { db.exec('PRAGMA foreign_keys=ON;'); }
   }
 
+  // Migrate recycler_applications table CHECK constraint to include 'suspended' and 'revoked'
+  const appTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='recycler_applications'").get();
+  if (appTableSql && appTableSql.sql && !appTableSql.sql.includes("'suspended'")) {
+    db.exec('PRAGMA foreign_keys=OFF;');
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      db.exec(`
+        CREATE TABLE recycler_applications_migrated (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL UNIQUE REFERENCES users(id),
+          business_name TEXT NOT NULL,
+          contact_phone TEXT NOT NULL DEFAULT '',
+          business_address TEXT NOT NULL DEFAULT '',
+          contact_details TEXT NOT NULL DEFAULT '',
+          gov_id_type TEXT NOT NULL,
+          gov_id_number TEXT NOT NULL,
+          gov_id_file TEXT NOT NULL,
+          photo_file TEXT NOT NULL,
+          licence_type TEXT NOT NULL,
+          licence_number TEXT NOT NULL,
+          licence_file TEXT NOT NULL,
+          area TEXT NOT NULL,
+          status TEXT NOT NULL CHECK(status IN ('pending','approved','rejected','suspended','revoked')),
+          admin_user_id TEXT,
+          admin_note TEXT,
+          reviewed_at INTEGER,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+        INSERT INTO recycler_applications_migrated (
+          id, user_id, business_name, contact_phone, business_address, contact_details,
+          gov_id_type, gov_id_number, gov_id_file, photo_file, licence_type, licence_number,
+          licence_file, area, status, admin_user_id, admin_note, reviewed_at, created_at, updated_at
+        )
+        SELECT
+          id, user_id, business_name, contact_phone, business_address, contact_details,
+          gov_id_type, gov_id_number, gov_id_file, photo_file, licence_type, licence_number,
+          licence_file, area, status, admin_user_id, admin_note, reviewed_at, created_at, updated_at
+        FROM recycler_applications;
+        DROP TABLE recycler_applications;
+        ALTER TABLE recycler_applications_migrated RENAME TO recycler_applications;
+      `);
+      db.exec('COMMIT');
+    } catch (error) { db.exec('ROLLBACK'); throw error; }
+    finally { db.exec('PRAGMA foreign_keys=ON;'); }
+  }
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, role TEXT NOT NULL CHECK(role IN ('generator','recycler','administrator')), name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, area TEXT NOT NULL, verification_status TEXT NOT NULL, account_status TEXT NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS registrations (id TEXT PRIMARY KEY, role TEXT NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL, area TEXT NOT NULL, provider_id TEXT, code_hash TEXT, status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, sent_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, verified_at INTEGER, user_id TEXT REFERENCES users(id));
@@ -56,7 +103,7 @@ export function openStorage(dbPath) {
       licence_number TEXT NOT NULL,
       licence_file TEXT NOT NULL,
       area TEXT NOT NULL,
-      status TEXT NOT NULL CHECK(status IN ('pending','approved','rejected')),
+      status TEXT NOT NULL CHECK(status IN ('pending','approved','rejected','suspended','revoked')),
       admin_user_id TEXT,
       admin_note TEXT,
       reviewed_at INTEGER,

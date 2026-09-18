@@ -47,6 +47,7 @@ let currentWallet = null;
 let savedBankAccount = null;
 let walletTransactions = [];
 let lifetimeTotal = 0;
+let paymentsActive = true;
 
 // File upload in-memory data
 const uploadData = {
@@ -566,6 +567,7 @@ async function showGeneratorScreen3(user) {
         if (state.bankAccount) savedBankAccount = state.bankAccount;
         if (state.walletTransactions) walletTransactions = state.walletTransactions;
         if (state.lifetimeTotal !== undefined) lifetimeTotal = state.lifetimeTotal;
+        if (state.paymentsActive !== undefined) paymentsActive = state.paymentsActive;
       }
     } catch {}
   }
@@ -1424,10 +1426,38 @@ function showRecyclerScreen4(user) {
   renderWalletCards();
   renderMaterialsDashboard();
   renderRecyclerIncomingRequests();
+  updateRecyclerViewRecordsBtn();
 
   $('step-one').classList.remove('current');
   $('step-two').classList.remove('current');
   $('step-three').classList.add('current');
+}
+
+async function updateRecyclerViewRecordsBtn() {
+  const btn = $('view-records-btn');
+  if (!btn) return;
+  try {
+    const res = await api('/api/user/records', {});
+    const count = (res.records || []).filter(r => r.status === 'completed').length;
+    btn.textContent = `View records (${count})`;
+    if (count > 0) {
+      btn.disabled = false;
+      btn.title = 'View completed transaction records';
+    } else {
+      btn.disabled = true;
+      btn.title = 'Records will populate once transactions are conducted';
+    }
+  } catch (err) {
+    const localCompleted = (incomingRequests || []).filter(r => r.status === 'completed').length;
+    btn.textContent = `View records (${localCompleted})`;
+    btn.disabled = localCompleted === 0;
+  }
+}
+
+if ($('view-records-btn')) {
+  $('view-records-btn').addEventListener('click', () => {
+    showAdminScreen8('myrecords');
+  });
 }
 
 function routeUser(user, state) {
@@ -1443,6 +1473,7 @@ function routeUser(user, state) {
   savedBankAccount = state.bankAccount || null;
   walletTransactions = state.walletTransactions || [];
   lifetimeTotal = state.lifetimeTotal || 0;
+  if (state.paymentsActive !== undefined) paymentsActive = state.paymentsActive;
 
   if (!user) {
     if (state.registration) {
@@ -2124,7 +2155,11 @@ async function showInspectionScreen7(listingId) {
       // Generator Decision Panel
       if (isGenerator) {
         $('screen7-generator-decision-panel').hidden = false;
-        $('screen7-verified-weight').textContent = `${inspection?.actual_quantity || finalOffer.offered_quantity || 0} ${inspection?.quantity_unit || finalOffer.quantity_unit || 'kg'}`;
+        const weight = inspection?.actual_quantity || finalOffer.offered_quantity || 0;
+        const unit = inspection?.quantity_unit || finalOffer.quantity_unit || 'kg';
+        $('screen7-verified-weight').textContent = `${weight} ${unit}`;
+        const unitRate = weight > 0 ? (finalOffer.amount / weight).toFixed(2) : '0.00';
+        if ($('screen7-verified-rate')) $('screen7-verified-rate').textContent = `₦${unitRate} / ${unit}`;
         $('screen7-verified-note').textContent = inspection?.notes ? `"${inspection.notes}"` : 'Inspection completed. Material matches pilot specifications.';
         $('screen7-payout-amount').textContent = `₦${Number(finalOffer.amount).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
         $('btn-accept-offer').disabled = false;
@@ -2191,9 +2226,31 @@ async function showInspectionScreen7(listingId) {
   }
 }
 
+function updateFundingBreakdown() {
+  const amt = Number($('screen7-offer-amount')?.value) || 0;
+  const qty = Number($('screen7-actual-qty')?.value) || 0;
+  const unit = $('screen7-actual-unit')?.value || 'kg';
+  if ($('screen7-breakdown-offer')) {
+    $('screen7-breakdown-offer').textContent = formatNaira(amt);
+  }
+  if ($('screen7-breakdown-total')) {
+    $('screen7-breakdown-total').textContent = formatNaira(amt);
+  }
+  if ($('screen7-breakdown-rate')) {
+    const rate = (qty > 0 && amt > 0) ? (amt / qty).toFixed(2) : '0.00';
+    $('screen7-breakdown-rate').textContent = `₦${rate} / ${unit}`;
+  }
+}
+
 // Screen 7: Inspection and Offer submission
 if ($('screen7-offer-amount')) {
   $('screen7-offer-amount').addEventListener('input', updateFundingBreakdown);
+}
+if ($('screen7-actual-qty')) {
+  $('screen7-actual-qty').addEventListener('input', updateFundingBreakdown);
+}
+if ($('screen7-actual-unit')) {
+  $('screen7-actual-unit').addEventListener('change', updateFundingBreakdown);
 }
 
 if ($('inspection-offer-form')) {
@@ -2318,11 +2375,20 @@ async function showAdminScreen8(tab = 'apps') {
     $('form-title').textContent = 'Your Marketplace Records';
     $('form-description').textContent = 'View your recyclable waste listings, inspection outcomes, and completed payouts.';
     if ($('screen8-main-heading')) $('screen8-main-heading').textContent = 'Your Transaction Records';
+    const badgeEl = document.querySelector('#screen-8-container .badge-admin');
+    if (badgeEl) {
+      badgeEl.textContent = 'MY RECORDS';
+      badgeEl.className = 'badge badge-approved';
+    }
+    const subtitleEl = document.querySelector('#screen-8-container .screen8-title-group p');
+    if (subtitleEl) subtitleEl.textContent = 'View your transaction history, receipts, and payout status.';
 
+    const adminTabsContainer = document.querySelector('.admin-tabs');
+    if (adminTabsContainer) adminTabsContainer.hidden = true;
     if ($('admin-tab-apps')) $('admin-tab-apps').hidden = true;
     if ($('admin-tab-materials')) $('admin-tab-materials').hidden = true;
     if ($('admin-tab-records')) $('admin-tab-records').hidden = true;
-    if ($('admin-tab-myrecords')) $('admin-tab-myrecords').hidden = false;
+    if ($('admin-tab-myrecords')) $('admin-tab-myrecords').hidden = true;
     if ($('admin-close-btn')) $('admin-close-btn').hidden = false;
     if ($('screen8-back-btn')) $('screen8-back-btn').hidden = false;
   } else {
@@ -2330,7 +2396,16 @@ async function showAdminScreen8(tab = 'apps') {
     $('form-title').textContent = 'Pilot Administrator Workspace';
     $('form-description').textContent = 'Review verification queue, manage material catalogue, and search transaction records.';
     if ($('screen8-main-heading')) $('screen8-main-heading').textContent = 'Pilot Administrator Workspace';
+    const badgeEl = document.querySelector('#screen-8-container .badge-admin');
+    if (badgeEl) {
+      badgeEl.textContent = 'SCREEN 8 · FR-17: RECORDS & ADMINISTRATION';
+      badgeEl.className = 'badge badge-admin';
+    }
+    const subtitleEl = document.querySelector('#screen-8-container .screen8-title-group p');
+    if (subtitleEl) subtitleEl.textContent = 'Manage verification queue, pilot material catalogue, and search audit records.';
 
+    const adminTabsContainer = document.querySelector('.admin-tabs');
+    if (adminTabsContainer) adminTabsContainer.hidden = false;
     if ($('admin-tab-apps')) $('admin-tab-apps').hidden = false;
     if ($('admin-tab-materials')) $('admin-tab-materials').hidden = false;
     if ($('admin-tab-records')) $('admin-tab-records').hidden = false;
@@ -2380,6 +2455,8 @@ async function loadAdminApplications() {
     if ($('apps-count-pending')) $('apps-count-pending').textContent = stats.pending ?? 0;
     if ($('apps-count-approved')) $('apps-count-approved').textContent = stats.approved ?? 0;
     if ($('apps-count-rejected')) $('apps-count-rejected').textContent = stats.rejected ?? 0;
+    if ($('apps-count-suspended')) $('apps-count-suspended').textContent = stats.suspended ?? 0;
+    if ($('apps-count-revoked')) $('apps-count-revoked').textContent = stats.revoked ?? 0;
     renderAdminApplications();
   } catch (err) {
     if ($('admin-apps-list')) {
@@ -2419,6 +2496,12 @@ function renderAdminApplications() {
     if (app.status === 'approved') {
       statusBadgeClass = 'badge-approved';
       statusText = 'Approved & Active';
+    } else if (app.status === 'suspended') {
+      statusBadgeClass = 'badge-rejected';
+      statusText = 'Suspended';
+    } else if (app.status === 'revoked') {
+      statusBadgeClass = 'badge-rejected';
+      statusText = 'Revoked';
     } else if (app.status === 'rejected') {
       statusBadgeClass = 'badge-rejected';
       statusText = 'Rejected';
@@ -2494,17 +2577,17 @@ function renderAdminApplications() {
             <span class="muted" style="font-size: 12px; margin-left: auto;">Reviewed ${reviewedTime || createdTime}</span>
           </div>
         </div>
-      ` : (app.status === 'rejected' ? `
+      ` : (app.status === 'suspended' || app.status === 'revoked' || app.status === 'rejected' ? `
         <div class="review-actions-box review-box-rejected">
           <div class="review-status-banner banner-rejected">
             <span class="status-dot dot-red"></span>
-            <span><strong>Account Status: Suspended / Rejected</strong>${app.admin_note ? ` — "${app.admin_note}"` : ''}</span>
+            <span><strong>Account Status: ${app.status === 'suspended' ? 'Suspended' : (app.status === 'revoked' ? 'Verification Revoked' : 'Rejected')}</strong>${app.admin_note ? ` — "${app.admin_note}"` : ''}</span>
           </div>
           <label for="admin-note-${app.id}" class="app-detail-label">Reinstatement / Decision Note</label>
-          <input id="admin-note-${app.id}" placeholder="Enter note to reinstate or update rejection note..." style="margin-top: 4px; margin-bottom: 8px;" value="${app.admin_note || ''}">
+          <input id="admin-note-${app.id}" placeholder="Enter note to reinstate or update note..." style="margin-top: 4px; margin-bottom: 8px;" value="${app.admin_note || ''}">
           <div class="review-btn-row">
             <button type="button" class="btn-pill btn-reinstate admin-btn-approve" data-id="${app.id}">✓ Re-instate & Approve</button>
-            <button type="button" class="btn-pill btn-update-note admin-btn-save-note-rejected" data-id="${app.id}">✎ Update Rejection Note</button>
+            <button type="button" class="btn-pill btn-update-note admin-btn-save-note-rejected" data-id="${app.id}">✎ Update Note</button>
             <span class="muted" style="font-size: 12px; margin-left: auto;">Reviewed ${reviewedTime || createdTime}</span>
           </div>
         </div>
@@ -2542,6 +2625,7 @@ function renderAdminApplications() {
     const suspendBtn = card.querySelector('.admin-btn-suspend');
     if (suspendBtn) {
       suspendBtn.addEventListener('click', () => {
+        if (!confirm('Are you sure you want to temporarily suspend this recycler? They will no longer be able to accept new listings.')) return;
         const note = noteInput ? noteInput.value.trim() : '';
         handleAdminAppReview(app.id, 'suspended', note || 'Account temporarily suspended by administrator.');
       });
@@ -2550,6 +2634,7 @@ function renderAdminApplications() {
     const revokeBtn = card.querySelector('.admin-btn-revoke');
     if (revokeBtn) {
       revokeBtn.addEventListener('click', () => {
+        if (!confirm('Are you sure you want to revoke verification for this recycler? Their verified status will be removed.')) return;
         const note = noteInput ? noteInput.value.trim() : '';
         handleAdminAppReview(app.id, 'revoked', note || 'Verification credentials revoked by administrator.');
       });
@@ -2567,7 +2652,7 @@ function renderAdminApplications() {
     if (saveNoteRejectBtn) {
       saveNoteRejectBtn.addEventListener('click', () => {
         const note = noteInput ? noteInput.value.trim() : '';
-        handleAdminAppReview(app.id, 'rejected', note || 'Rejection notes updated by administrator.');
+        handleAdminAppReview(app.id, app.status || 'rejected', note || 'Notes updated by administrator.');
       });
     }
 
@@ -2790,7 +2875,7 @@ function renderAdminRecordsList(container, records, isAdmin) {
     } else if (rec.status === 'accepted' || rec.status === 'handover arranged') {
       actionBtnLabel = currentUser?.role === 'recycler' && rec.status === 'handover arranged' ? 'Record Inspection & Offer →' : 'View Handover Coordination →';
     } else if (rec.status === 'completed') {
-      actionBtnLabel = 'View Receipt & Audit Trail →';
+      actionBtnLabel = isAdmin ? 'View Receipt & Audit Trail →' : 'View Receipt & Timeline →';
     }
 
     card.innerHTML = `
@@ -2847,7 +2932,7 @@ function renderAdminRecordsList(container, records, isAdmin) {
       <!-- Expandable In-Place Milestone Timeline Drawer -->
       <div class="record-audit-drawer" id="drawer-${rec.id}" hidden>
         <h5>
-          <span>Lifecycle Milestones &amp; Audit Trail</span>
+          <span>${isAdmin ? 'Lifecycle Milestones &amp; Audit Trail' : 'Transaction History &amp; Milestones'}</span>
           <button type="button" class="text-button-subtle btn-close-drawer" data-id="${rec.id}" style="font-size: 11px;">Close ▲</button>
         </h5>
         <div class="timeline-mini" id="timeline-mini-${rec.id}">
@@ -3099,6 +3184,20 @@ function openTopupModal() {
   if (firstRadio) firstRadio.checked = true;
   if ($('virtual-acct-box')) $('virtual-acct-box').hidden = true;
   if ($('v-acct-beneficiary')) $('v-acct-beneficiary').textContent = currentUser ? currentUser.name : 'Your Business';
+
+  if (!paymentsActive) {
+    notice('Notice: Live payment provider is not connected (Demo payments inactive).');
+    if ($('btn-submit-topup')) {
+      $('btn-submit-topup').disabled = true;
+      $('btn-submit-topup').textContent = 'Provider Unavailable';
+    }
+  } else {
+    if ($('btn-submit-topup')) {
+      $('btn-submit-topup').disabled = false;
+      $('btn-submit-topup').innerHTML = 'Complete Top-Up <span aria-hidden="true">→</span>';
+    }
+  }
+
   modal.hidden = false;
   $('topup-amount-input')?.focus();
 }
@@ -3147,6 +3246,19 @@ function openWithdrawModal() {
   if ($('withdraw-amount-input')) {
     $('withdraw-amount-input').value = '';
     $('withdraw-amount-input').max = String(avail);
+  }
+
+  if (!paymentsActive) {
+    notice('Notice: Live payout provider is not connected (Demo withdrawals inactive).');
+    if ($('btn-submit-withdraw')) {
+      $('btn-submit-withdraw').disabled = true;
+      $('btn-submit-withdraw').textContent = 'Provider Unavailable';
+    }
+  } else {
+    if ($('btn-submit-withdraw')) {
+      $('btn-submit-withdraw').disabled = false;
+      $('btn-submit-withdraw').innerHTML = 'Confirm Withdrawal <span aria-hidden="true">→</span>';
+    }
   }
 
   if (savedBankAccount && savedBankAccount.account_number) {
@@ -3260,8 +3372,8 @@ if ($('bank-account-num')) {
     const val = e.target.value.replace(/\D/g, '').slice(0, 10);
     e.target.value = val;
     if (val.length === 10) {
-      if ($('bank-account-name')) {
-        $('bank-account-name').value = (currentUser?.name || 'VERIFIED USER').toUpperCase();
+      if ($('bank-account-name') && !$('bank-account-name').value) {
+        $('bank-account-name').value = (currentUser?.name || '').toUpperCase();
       }
       if ($('bank-verified-indicator')) {
         $('bank-verified-indicator').hidden = false;
@@ -3293,7 +3405,7 @@ if ($('wallet-bank-form')) {
       return;
     }
 
-    perform($('btn-save-bank-account'), 'Verifying & saving bank…', async () => {
+    perform($('btn-save-bank-account'), 'Saving bank details…', async () => {
       const res = await api('/api/wallet/bank-account', {
         bankCode,
         bankName,
@@ -3303,7 +3415,7 @@ if ($('wallet-bank-form')) {
       if (res.bankAccount) savedBankAccount = res.bankAccount;
       renderWalletCards();
       closeBankModal();
-      notice(`Bank account (${bankName} - ${accountNumber}) saved and verified!`);
+      notice(`Bank account (${bankName} - ${accountNumber}) saved for manual settlements.`);
     });
   });
 }

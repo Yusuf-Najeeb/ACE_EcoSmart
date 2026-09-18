@@ -3689,11 +3689,34 @@ footer {
     font-size: 24px;
   }
   .admin-tabs {
-    gap: 4px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    border-bottom: none;
+    background: #f1f6f3;
+    padding: 6px;
+    border-radius: 8px;
+    overflow-x: visible;
   }
   .admin-tab-btn {
-    padding: 6px 10px;
+    border-radius: 6px;
+    border-bottom: none !important;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 6px;
     font-size: 12px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    white-space: normal;
+  }
+  .admin-tab-btn.active {
+    background: #174d38;
+    color: #ffffff !important;
+    font-weight: 700;
+  }
+  .admin-tab-btn.active .badge {
+    background: #ffffff;
+    color: #174d38;
   }
   .filter-pills {
     gap: 4px;
