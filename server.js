@@ -48,11 +48,41 @@ export function sameArea(a, b) {
   return false;
 }
 
+export function resolvePublicOrigin(req, configuredOrigin) {
+  if (process.env.APP_ORIGIN && process.env.APP_ORIGIN.trim()) {
+    const o = process.env.APP_ORIGIN.trim().replace(/\/+$/, '');
+    return o.startsWith('http://') || o.startsWith('https://') ? o : `https://${o}`;
+  }
+  if (process.env.RAILWAY_PUBLIC_DOMAIN && process.env.RAILWAY_PUBLIC_DOMAIN.trim()) {
+    const d = process.env.RAILWAY_PUBLIC_DOMAIN.trim().replace(/\/+$/, '');
+    return d.startsWith('http://') || d.startsWith('https://') ? d : `https://${d}`;
+  }
+  if (req && req.headers) {
+    const rawForwarded = req.headers['x-forwarded-host'];
+    const forwardedHost = (Array.isArray(rawForwarded) ? rawForwarded[0] : (rawForwarded || '')).split(',')[0].trim();
+    const host = forwardedHost || (typeof req.headers.host === 'string' ? req.headers.host.trim() : '');
+    const cleanHost = host.split(':')[0].toLowerCase();
+    if (cleanHost && cleanHost !== 'localhost' && cleanHost !== '127.0.0.1' && cleanHost !== '0.0.0.0') {
+      const rawProto = req.headers['x-forwarded-proto'];
+      const proto = (Array.isArray(rawProto) ? rawProto[0] : (rawProto || 'https')).split(',')[0].trim();
+      return `${proto}://${forwardedHost || host}`;
+    }
+  }
+  if (configuredOrigin && !configuredOrigin.includes('localhost') && !configuredOrigin.includes('127.0.0.1')) {
+    return configuredOrigin.replace(/\/+$/, '');
+  }
+  return (configuredOrigin || 'http://localhost:3000').replace(/\/+$/, '');
+}
+
 export function isAllowedOrigin(req, configuredOrigin) {
   const reqOrigin = req.headers.origin;
   if (!reqOrigin) return true;
   if (configuredOrigin && reqOrigin === configuredOrigin) return true;
-  if (process.env.APP_ORIGIN && reqOrigin === process.env.APP_ORIGIN.replace(/\/+$/, '')) return true;
+  if (process.env.APP_ORIGIN) {
+    const envOrigin = process.env.APP_ORIGIN.trim().replace(/\/+$/, '');
+    const normalizedEnv = envOrigin.startsWith('http') ? envOrigin : `https://${envOrigin}`;
+    if (reqOrigin === envOrigin || reqOrigin === normalizedEnv) return true;
+  }
 
   const host = req.headers['x-forwarded-host'] || req.headers.host;
   if (host) {
@@ -80,7 +110,16 @@ export function validate(input) {
   return { role: input.role, name, area, email };
 }
 
-export function createApp({ dbPath = getDatabasePath(), provider = createEmailProvider(), origin = (process.env.APP_ORIGIN || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000')).replace(/\/+$/, ''), demoPayments = process.env.DEMO_PAYMENTS === 'true', secure = process.env.COOKIE_SECURE === 'true', now = Date.now, visionAnalyzer = analyzeWasteImage } = {}) {
+export function createApp({
+  dbPath = getDatabasePath(),
+  provider = createEmailProvider(),
+  origin = resolvePublicOrigin(null, process.env.APP_ORIGIN || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000')),
+  demoPayments = process.env.DEMO_PAYMENTS === 'true',
+  secure = process.env.COOKIE_SECURE === 'true',
+  now = Date.now,
+  visionAnalyzer = analyzeWasteImage
+} = {}) {
+  const getPublicOrigin = (req) => resolvePublicOrigin(req, origin);
   const db = openStorage(dbPath);
   const key = verificationKey(dbPath);
   const codeHash = (id, code) => createHmac('sha256', key).update(`${id}:${code}`).digest('hex');
@@ -936,15 +975,16 @@ export function createApp({ dbPath = getDatabasePath(), provider = createEmailPr
           const responseRecord = db.prepare('SELECT * FROM listing_responses WHERE listing_id=?').get(listingId);
 
           if (provider && typeof provider.sendNotification === 'function') {
+            const publicOrigin = getPublicOrigin(req);
             if (decision === 'accepted') {
               const recName = updatedListing.recycler_name || 'Verified Recycler';
               const subject = `EcoSmart · Listing Accepted & Handover Arranged by ${recName}`;
-              const text = `Hello ${updatedListing.generator_name},\n\nGreat news! ${recName} has accepted your recyclable waste listing for ${updatedListing.material_name || 'recyclable materials'}.\n\nHandover Arrangement: ${responseRecord?.agreed_arrangement === 'pickup' ? '🚚 Recycler Pickup' : '📍 Generator Drop-off'}\nCoordination Note: ${responseRecord?.arrangement_note || 'Direct contact details have been unlocked.'}\n\nPlease visit EcoSmart at ${origin} to view their verified contact phone number, yard address, and coordinate the exchange.\n\nThank you for recycling with EcoSmart!`;
+              const text = `Hello ${updatedListing.generator_name},\n\nGreat news! ${recName} has accepted your recyclable waste listing for ${updatedListing.material_name || 'recyclable materials'}.\n\nHandover Arrangement: ${responseRecord?.agreed_arrangement === 'pickup' ? '🚚 Recycler Pickup' : '📍 Generator Drop-off'}\nCoordination Note: ${responseRecord?.arrangement_note || 'Direct contact details have been unlocked.'}\n\nPlease visit EcoSmart at ${publicOrigin} to view their verified contact phone number, yard address, and coordinate the exchange.\n\nThank you for recycling with EcoSmart!`;
               provider.sendNotification(updatedListing.generator_email, subject, text).catch(() => {});
             } else {
               const recName = updatedListing.recycler_name || 'Verified Recycler';
               const subject = `EcoSmart · Update on your recyclable waste listing`;
-              const text = `Hello ${updatedListing.generator_name},\n\n${recName} was unable to accept your recyclable waste listing for ${updatedListing.material_name || 'recyclables'}.\nReason: ${responseRecord?.decline_reason || 'Recycler currently at capacity'}\n\nPlease visit EcoSmart at ${origin} to choose another verified buyer in your area.`;
+              const text = `Hello ${updatedListing.generator_name},\n\n${recName} was unable to accept your recyclable waste listing for ${updatedListing.material_name || 'recyclables'}.\nReason: ${responseRecord?.decline_reason || 'Recycler currently at capacity'}\n\nPlease visit EcoSmart at ${publicOrigin} to choose another verified buyer in your area.`;
               provider.sendNotification(updatedListing.generator_email, subject, text).catch(() => {});
             }
           }
@@ -1081,8 +1121,9 @@ export function createApp({ dbPath = getDatabasePath(), provider = createEmailPr
           }
 
           if (provider && typeof provider.sendNotification === 'function') {
+            const publicOrigin = getPublicOrigin(req);
             const subject = `EcoSmart · Final Offer Funded: ₦${amount} for your ${listing.material_name}`;
-            const text = `Hello ${listing.generator_name},\n\n${listing.recycler_name} has inspected your ${listing.material_name} (${actualQuantity} ${actualUnit}) and funded a final offer of ₦${amount}.\n\nZero commission guarantee: 100% of this amount will be paid to you upon acceptance.\n\nYou have 24 hours to review and accept this offer on EcoSmart: ${origin}\n\nThank you for recycling with EcoSmart!`;
+            const text = `Hello ${listing.generator_name},\n\n${listing.recycler_name} has inspected your ${listing.material_name} (${actualQuantity} ${actualUnit}) and funded a final offer of ₦${amount}.\n\nZero commission guarantee: 100% of this amount will be paid to you upon acceptance.\n\nYou have 24 hours to review and accept this offer on EcoSmart: ${publicOrigin}\n\nThank you for recycling with EcoSmart!`;
             provider.sendNotification(listing.generator_email, subject, text).catch(() => {});
           }
 
