@@ -347,10 +347,13 @@ export function createApp({
       materials = db.prepare('SELECT * FROM supported_materials ORDER BY rowid ASC').all();
     }
 
+    const hasConfiguredMaterials = user.role === 'recycler' && Array.isArray(materialSettings) ? materialSettings.some(s => s.accepted === 1) : false;
+
     return {
       recyclerApplication,
       materials,
       materialSettings,
+      hasConfiguredMaterials,
       availability,
       intakes: generatorIntakes,
       generatorIntakes,
@@ -1759,7 +1762,12 @@ export function createApp({
 
           const updatedSettings = db.prepare('SELECT * FROM recycler_material_settings WHERE user_id=?').all(user.id);
           const availRow = db.prepare('SELECT availability FROM recycler_availability WHERE user_id=?').get(user.id);
-          return json(200, { ok: true, materialSettings: updatedSettings, availability: availRow ? availRow.availability : 'available' });
+          return json(200, {
+            ok: true,
+            materialSettings: updatedSettings,
+            availability: availRow ? availRow.availability : 'available',
+            hasConfiguredMaterials: updatedSettings.some(s => s.accepted === 1)
+          });
         }
         if (path === '/api/recycler/availability') {
           const user = account(req);

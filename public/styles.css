@@ -44,6 +44,17 @@ main {
   overflow: hidden;
   box-shadow: 0 18px 65px #173b3010;
   background: white;
+  transition: grid-template-columns 0.2s ease;
+}
+main.dashboard-mode {
+  grid-template-columns: 1fr !important;
+}
+aside[hidden],
+main.dashboard-mode aside {
+  display: none !important;
+}
+main.dashboard-mode .card {
+  padding: 40px 48px;
 }
 aside {
   background: #103e30;
@@ -58,6 +69,55 @@ aside .eyebrow { color: #afd7b8; }
 h1 { font-size: 40px; font-weight: 600; line-height: 1.17; letter-spacing: -1.8px; margin: 12px 0 22px; }
 .intro { font-size: 16px; line-height: 1.7; color: #d1e2d8; max-width: 320px; }
 .steps { margin-top: 30px; }
+
+/* App Initial Loader */
+.app-initial-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+  width: 100%;
+  animation: fadeIn 0.2s ease;
+}
+.app-initial-loader[hidden] {
+  display: none !important;
+}
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.loader-brand {
+  font-size: 26px;
+  font-weight: 750;
+  color: #123f30;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.loader-brand strong {
+  color: #26864e;
+}
+.loader-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3.5px solid #e1ebe4;
+  border-top-color: #24814c;
+  border-radius: 50%;
+  animation: spinLoader 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+.loader-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #557062;
+  margin: 0;
+}
+@keyframes spinLoader {
+  to { transform: rotate(360deg); }
+}
 .steps p { font-size: 15px; color: #b5cfc1; display: flex; gap: 16px; align-items: center; margin: 0 0 20px; }
 .steps span { font-size: 12px; border: 1px solid #719788; border-radius: 50%; width: 32px; height: 32px; display: grid; place-items: center; }
 .steps .current { color: white; font-weight: 650; }
@@ -576,6 +636,63 @@ input:checked + .slider:before { transform: translateX(20px); }
   color: #556e62;
   padding: 3px 9px;
   border-radius: 12px;
+}
+
+/* Screen 2B: Mandatory Recycler Materials Onboarding */
+.onboarding-setup-header {
+  margin-bottom: 18px;
+}
+.onboarding-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.onboarding-setup-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #12382a;
+  margin: 0 0 6px 0;
+}
+.alert-box-info {
+  display: flex;
+  gap: 12px;
+  background: #f0f7f3;
+  border: 1px solid #bce1cd;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  align-items: flex-start;
+}
+.alert-box-icon {
+  font-size: 20px;
+  line-height: 1.2;
+}
+.alert-box-content {
+  font-size: 13.5px;
+  color: #1a4d3b;
+  line-height: 1.5;
+}
+.materials-section-meta-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+.onboarding-setup-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2ece5;
+}
+.btn-large {
+  width: 100%;
+  max-width: 360px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 700;
 }
 .empty-state-box {
   background: #f8faf9;

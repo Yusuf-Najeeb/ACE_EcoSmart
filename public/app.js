@@ -127,6 +127,7 @@ function hideAllScreens() {
     clearInterval(callPollInterval);
     callPollInterval = null;
   }
+  if ($('app-initial-loader')) $('app-initial-loader').hidden = true;
   $('auth-tabs').hidden = Boolean(currentUser);
   $('registration').hidden = true;
   $('verification').hidden = true;
@@ -138,6 +139,7 @@ function hideAllScreens() {
   if ($('screen-6-container')) $('screen-6-container').hidden = true;
   if ($('screen-7-container')) $('screen-7-container').hidden = true;
   if ($('screen-8-container')) $('screen-8-container').hidden = true;
+  if ($('screen-materials-setup-container')) $('screen-materials-setup-container').hidden = true;
   $('screen-2-container').hidden = true;
   $('screen-4-container').hidden = true;
   $('header-logout').hidden = !currentUser;
@@ -145,11 +147,43 @@ function hideAllScreens() {
   if ($('header-admin-btn')) $('header-admin-btn').hidden = !currentUser || currentUser.role !== 'administrator';
 }
 
+function setAsideVisible(show) {
+  const aside = $('aside-panel');
+  const main = $('main-container');
+  if (aside) aside.hidden = !show;
+  if (main) {
+    if (show) {
+      main.classList.remove('dashboard-mode');
+    } else {
+      main.classList.add('dashboard-mode');
+    }
+  }
+}
+
+function setHeaderTitles(stage = '', title = '', desc = '') {
+  const stageEl = $('stage-label');
+  const titleEl = $('form-title');
+  const descEl = $('form-description');
+  if (stageEl) {
+    stageEl.textContent = stage;
+    stageEl.hidden = !stage;
+  }
+  if (titleEl) {
+    titleEl.textContent = title;
+    titleEl.hidden = !title;
+  }
+  if (descEl) {
+    descEl.textContent = desc;
+    descEl.hidden = !desc;
+  }
+}
+
 function switchAuthTab(tab) {
   activeAuthTab = tab;
   error('');
   notice('');
   hideAllScreens();
+  setAsideVisible(true);
   $('auth-tabs').hidden = false;
 
   if (tab === 'register') {
@@ -158,9 +192,7 @@ function switchAuthTab(tab) {
     $('tab-login').classList.remove('active');
     $('tab-login').setAttribute('aria-selected', 'false');
 
-    $('stage-label').textContent = 'LET’S GET STARTED';
-    $('form-title').textContent = 'Create your account';
-    $('form-description').textContent = 'Tell us how you’ll use EcoSmart.';
+    setHeaderTitles('LET’S GET STARTED', 'Create your account', 'Tell us how you’ll use EcoSmart.');
     $('registration').hidden = false;
     $('step-one').classList.add('current');
     $('step-two').classList.remove('current');
@@ -171,9 +203,7 @@ function switchAuthTab(tab) {
     $('tab-register').classList.remove('active');
     $('tab-register').setAttribute('aria-selected', 'false');
 
-    $('stage-label').textContent = 'RETURNING USER';
-    $('form-title').textContent = 'Welcome back';
-    $('form-description').textContent = 'Sign in to access your EcoSmart account.';
+    setHeaderTitles('RETURNING USER', 'Welcome back', 'Sign in to access your EcoSmart account.');
     $('login-form').hidden = false;
     $('step-one').classList.add('current');
     $('step-two').classList.remove('current');
@@ -185,11 +215,10 @@ function switchAuthTab(tab) {
 function showCode(data) {
   pending = data;
   hideAllScreens();
+  setAsideVisible(true);
   $('auth-tabs').hidden = true;
   $('verification').hidden = false;
-  $('stage-label').textContent = 'ONE MORE STEP';
-  $('form-title').textContent = 'Verify your email';
-  $('form-description').textContent = 'Confirm it’s you with a one-time email code.';
+  setHeaderTitles('ONE MORE STEP', 'Verify your email', 'Confirm it’s you with a one-time email code.');
   $('sent-to').textContent = `Code sent to ${data.email}.`;
   $('step-one').classList.remove('current');
   $('step-two').classList.add('current');
@@ -202,11 +231,10 @@ function showCode(data) {
 function showLoginCode(data) {
   pendingLogin = data;
   hideAllScreens();
+  setAsideVisible(true);
   $('auth-tabs').hidden = true;
   $('login-verification').hidden = false;
-  $('stage-label').textContent = 'SIGN IN';
-  $('form-title').textContent = 'Enter verification code';
-  $('form-description').textContent = 'Enter the 6-digit one-time code sent to your email.';
+  setHeaderTitles('SIGN IN', 'Enter verification code', 'Enter the 6-digit one-time code sent to your email.');
   $('login-sent-to').textContent = `Sign-in code sent to ${data.email}.`;
   $('step-one').classList.remove('current');
   $('step-two').classList.add('current');
@@ -542,10 +570,9 @@ function renderGeneratorIntakeHistory() {
 
 async function showGeneratorScreen3(user) {
   hideAllScreens();
+  setAsideVisible(false);
   $('screen-3-container').hidden = false;
-  $('stage-label').textContent = 'SCREEN 3 · FR-06 & FR-07';
-  $('form-title').textContent = 'Check my waste';
-  $('form-description').textContent = 'Scan or upload your recyclable item, then confirm its category.';
+  setHeaderTitles('SCREEN 3 · FR-06 & FR-07', 'Check my waste', 'Scan or upload your recyclable item, then confirm its category.');
 
   $('dash-generator-name').textContent = user.name;
   $('dash-generator-area').textContent = user.area;
@@ -732,10 +759,9 @@ function renderMatchingRecyclers(matches) {
 
 function showGeneratorScreen5(user, material, matches) {
   hideAllScreens();
+  setAsideVisible(false);
   $('screen-5-container').hidden = false;
-  $('stage-label').textContent = 'SCREEN 5 · FR-08 & FR-09';
-  $('form-title').textContent = 'Verified buyers & direct listing';
-  $('form-description').textContent = `Matching buyers in your area for ${material.name}.`;
+  setHeaderTitles('SCREEN 5 · FR-08 & FR-09', 'Verified buyers & direct listing', `Matching buyers in your area for ${material.name}.`);
 
   $('screen5-material-badge').textContent = material.name;
   $('matching-heading').textContent = `Verified Recyclers Buying ${material.name}`;
@@ -836,10 +862,9 @@ function renderRecyclerIncomingRequests() {
 
 async function showListingScreen6(listingId) {
   hideAllScreens();
+  setAsideVisible(false);
   $('screen-6-container').hidden = false;
-  $('stage-label').textContent = 'SCREEN 6 · FR-10 & FR-11';
-  $('form-title').textContent = 'Listing & Handover Coordination';
-  $('form-description').textContent = 'Direct one-recycler transaction details and coordination.';
+  setHeaderTitles('SCREEN 6 · FR-10 & FR-11', 'Listing & Handover Coordination', 'Direct one-recycler transaction details and coordination.');
 
   // Reset panels
   $('screen6-recycler-action-panel').hidden = true;
@@ -1243,10 +1268,9 @@ if ($('btn-call-mute')) {
 
 function showRecyclerScreen2(user, app) {
   hideAllScreens();
+  setAsideVisible(false);
   $('screen-2-container').hidden = false;
-  $('stage-label').textContent = 'SCREEN 2 · FR-02';
-  $('form-title').textContent = 'Recycler verification application';
-  $('form-description').textContent = 'Submit your identification and licence details for administrator review.';
+  setHeaderTitles('SCREEN 2 · FR-02', 'Recycler verification application', 'Submit your identification and licence details for administrator review.');
   $('screen2-user-tag').textContent = `${user.name} (${user.email})`;
   
   $('step-one').classList.remove('current');
@@ -1337,8 +1361,13 @@ function showRecyclerScreen2(user, app) {
   }
 }
 
-function renderMaterialsDashboard() {
-  const container = $('material-settings-list');
+function hasAcceptedMaterials() {
+  return Array.isArray(userMaterialSettings) && userMaterialSettings.some(s => (s.accepted === 1 || s.accepted === true) && Number(s.price) > 0);
+}
+
+function renderMaterialsList(containerId, prefix = 'mat') {
+  const container = $(containerId);
+  if (!container) return;
   container.innerHTML = '';
 
   const defaultPrices = {
@@ -1365,11 +1394,11 @@ function renderMaterialsDashboard() {
 
     const card = document.createElement('div');
     card.className = 'material-card';
-    card.id = `material-card-${m.id}`;
+    card.id = `${prefix}-card-${m.id}`;
     card.innerHTML = `
       <div class="material-header">
-        <label class="material-checkbox-label" for="mat-chk-${m.id}">
-          <input type="checkbox" id="mat-chk-${m.id}" data-material="${m.id}" ${isAccepted ? 'checked' : ''}>
+        <label class="material-checkbox-label" for="${prefix}-chk-${m.id}">
+          <input type="checkbox" id="${prefix}-chk-${m.id}" data-material="${m.id}" ${isAccepted ? 'checked' : ''}>
           <span>${m.name}</span>
         </label>
         <span class="count-pill">${m.recyclable ? '100% Recyclable' : 'Special Handling'}</span>
@@ -1377,16 +1406,16 @@ function renderMaterialsDashboard() {
       <p class="material-guidance">${m.guidance}</p>
       <div class="material-pricing-row">
         <div>
-          <label for="mat-price-${m.id}">Estimated Buying Price</label>
+          <label for="${prefix}-price-${m.id}">Estimated Buying Price</label>
           <div class="price-input-wrapper">
             <span class="currency-prefix">₦</span>
-            <input type="number" step="any" min="0" id="mat-price-${m.id}" class="price-input" value="${price}" ${!isAccepted ? 'disabled' : ''}>
+            <input type="number" step="any" min="0" id="${prefix}-price-${m.id}" class="price-input" value="${price}" ${!isAccepted ? 'disabled' : ''}>
           </div>
           <span class="estimate-pill">Estimate — not final offer</span>
         </div>
         <div>
-          <label for="mat-unit-${m.id}">Price Unit</label>
-          <select id="mat-unit-${m.id}" class="unit-select" ${!isAccepted ? 'disabled' : ''}>
+          <label for="${prefix}-unit-${m.id}">Price Unit</label>
+          <select id="${prefix}-unit-${m.id}" class="unit-select" ${!isAccepted ? 'disabled' : ''}>
             <option value="per kilogram" ${unit === 'per kilogram' ? 'selected' : ''}>per kilogram (kg)</option>
             <option value="per item" ${unit === 'per item' ? 'selected' : ''}>per item</option>
             <option value="per bag" ${unit === 'per bag' ? 'selected' : ''}>per bag</option>
@@ -1396,23 +1425,50 @@ function renderMaterialsDashboard() {
     `;
 
     // Toggle disabled price/unit when checkbox toggles
-    const chk = card.querySelector(`#mat-chk-${m.id}`);
+    const chk = card.querySelector(`#${prefix}-chk-${m.id}`);
     chk.addEventListener('change', () => {
       const checked = chk.checked;
-      card.querySelector(`#mat-price-${m.id}`).disabled = !checked;
-      card.querySelector(`#mat-unit-${m.id}`).disabled = !checked;
+      card.querySelector(`#${prefix}-price-${m.id}`).disabled = !checked;
+      card.querySelector(`#${prefix}-unit-${m.id}`).disabled = !checked;
     });
 
     container.appendChild(card);
   });
 }
 
-function showRecyclerScreen4(user) {
+function renderMaterialsDashboard() {
+  renderMaterialsList('material-settings-list', 'mat');
+}
+
+function showRecyclerMaterialsSetup(user) {
   hideAllScreens();
+  setAsideVisible(false);
+  if ($('screen-materials-setup-container')) $('screen-materials-setup-container').hidden = false;
+  setHeaderTitles('ONBOARDING · MANDATORY STEP', 'Accepted Materials & Estimated Prices', 'Select which materials you buy, set your estimated buying price in Naira (₦), and pick a unit.');
+
+  $('step-one').classList.remove('current');
+  $('step-two').classList.remove('current');
+  $('step-three').classList.add('current');
+
+  if ($('onboarding-materials-error')) $('onboarding-materials-error').hidden = true;
+  renderMaterialsList('onboarding-materials-list', 'onboard-mat');
+}
+
+function showRecyclerScreen4(user) {
+  if (!hasAcceptedMaterials()) {
+    showRecyclerMaterialsSetup(user);
+    const errBox = $('onboarding-materials-error');
+    if (errBox) {
+      errBox.textContent = 'Please configure and save at least one accepted material and price before accessing your dashboard.';
+      errBox.hidden = false;
+    }
+    return;
+  }
+
+  hideAllScreens();
+  setAsideVisible(false);
   $('screen-4-container').hidden = false;
-  $('stage-label').textContent = 'SCREEN 4 · FR-03 & FR-04';
-  $('form-title').textContent = 'Recycler marketplace dashboard';
-  $('form-description').textContent = 'Manage your accepted materials, estimated buying prices, and availability.';
+  setHeaderTitles('SCREEN 4 · FR-03 & FR-04', 'Recycler marketplace dashboard', 'Manage your accepted materials, estimated buying prices, and availability.');
 
   $('dash-recycler-name').textContent = user.name;
   $('dash-recycler-area').textContent = user.area;
@@ -1492,7 +1548,11 @@ function routeUser(user, state) {
     showGeneratorScreen3(user);
   } else if (user.role === 'recycler') {
     if (user.accountStatus === 'active' || user.accountStatus === 'approved') {
-      showRecyclerScreen4(user);
+      if (hasAcceptedMaterials()) {
+        showRecyclerScreen4(user);
+      } else {
+        showRecyclerMaterialsSetup(user);
+      }
     } else {
       showRecyclerScreen2(user, recyclerApp);
     }
@@ -1632,8 +1692,88 @@ $('resubmit-app-btn').addEventListener('click', () => {
 });
 
 $('continue-to-dashboard-btn').addEventListener('click', () => {
-  if (currentUser) showRecyclerScreen4(currentUser);
+  if (currentUser) {
+    if (hasAcceptedMaterials()) {
+      showRecyclerScreen4(currentUser);
+    } else {
+      showRecyclerMaterialsSetup(currentUser);
+    }
+  }
 });
+
+if ($('onboarding-materials-form')) {
+  $('onboarding-materials-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errBox = $('onboarding-materials-error');
+    if (errBox) errBox.hidden = true;
+
+    const settings = [];
+    let acceptedCount = 0;
+
+    for (const m of supportedMaterials) {
+      const chk = $(`onboard-mat-chk-${m.id}`);
+      const priceInput = $(`onboard-mat-price-${m.id}`);
+      const unitSelect = $(`onboard-mat-unit-${m.id}`);
+      const isChecked = chk && chk.checked;
+      const price = priceInput ? parseFloat(priceInput.value) : 0;
+      const unit = unitSelect ? unitSelect.value : 'per kilogram';
+
+      if (isChecked) {
+        if (!Number.isFinite(price) || price <= 0) {
+          if (errBox) {
+            errBox.textContent = `Please enter a valid price greater than ₦0 for ${m.name}.`;
+            errBox.hidden = false;
+            priceInput?.focus();
+          }
+          return;
+        }
+        acceptedCount++;
+      }
+      settings.push({
+        materialId: m.id,
+        accepted: Boolean(isChecked),
+        price: Number.isFinite(price) ? price : 0,
+        unit
+      });
+    }
+
+    if (acceptedCount === 0) {
+      if (errBox) {
+        errBox.textContent = 'Please select at least one material you buy and set an estimated price before continuing.';
+        errBox.hidden = false;
+      }
+      return;
+    }
+
+    const btn = $('onboarding-save-materials-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving materials…';
+    }
+
+    try {
+      const res = await api('/api/recycler/settings', {
+        settings,
+        availability: 'available'
+      });
+      userMaterialSettings = res.materialSettings || [];
+      notice('Marketplace settings saved! Your profile is now live for nearby generators.');
+      showRecyclerScreen4(currentUser);
+    } catch (err) {
+      if (errBox) {
+        errBox.textContent = err.message || 'Failed to save settings. Please try again.';
+        errBox.hidden = false;
+      } else {
+        error(err.message || 'Failed to save settings.');
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Save &amp; Launch Dashboard <span aria-hidden="true">→</span>';
+      }
+    }
+  });
+}
 
 // Pilot Admin Review Simulation
 $('admin-approve-btn').addEventListener('click', () => {
@@ -1706,6 +1846,12 @@ $('marketplace-settings-form').addEventListener('submit', event => {
     setTimeout(() => { $('save-status-msg').hidden = true; }, 3500);
   });
 });
+
+if ($('btn-edit-materials-onboarding')) {
+  $('btn-edit-materials-onboarding').addEventListener('click', () => {
+    if (currentUser) showRecyclerMaterialsSetup(currentUser);
+  });
+}
 
 $('back-to-screen2-btn').addEventListener('click', () => {
   if (currentUser) showRecyclerScreen2(currentUser, recyclerApp);
@@ -2058,10 +2204,9 @@ function renderAuditTimeline(events) {
 
 async function showInspectionScreen7(listingId) {
   hideAllScreens();
+  setAsideVisible(false);
   $('screen-7-container').hidden = false;
-  $('stage-label').textContent = 'SCREEN 7 · FR-12 to FR-16';
-  $('form-title').textContent = 'Inspection, final offer, and decision';
-  $('form-description').textContent = 'Verified physical inspection, funded escrow offer, generator decision, and payout.';
+  setHeaderTitles('SCREEN 7 · FR-12 to FR-16', 'Inspection, final offer, and decision', 'Verified physical inspection, funded escrow offer, generator decision, and payout.');
 
   // Reset panels
   $('screen7-countdown-banner').hidden = true;
@@ -2365,15 +2510,14 @@ if ($('screen7-logout-btn')) {
 
 async function showAdminScreen8(tab = 'apps') {
   hideAllScreens();
+  setAsideVisible(false);
   $('screen-8-container').hidden = false;
 
   const isAdmin = currentUser?.role === 'administrator';
 
   if (!isAdmin) {
     tab = 'myrecords';
-    $('stage-label').textContent = 'TRANSACTION HISTORY';
-    $('form-title').textContent = 'Your Marketplace Records';
-    $('form-description').textContent = 'View your recyclable waste listings, inspection outcomes, and completed payouts.';
+    setHeaderTitles('TRANSACTION HISTORY', 'Your Marketplace Records', 'View your recyclable waste listings, inspection outcomes, and completed payouts.');
     if ($('screen8-main-heading')) $('screen8-main-heading').textContent = 'Your Transaction Records';
     const badgeEl = document.querySelector('#screen-8-container .badge-admin');
     if (badgeEl) {
@@ -2392,9 +2536,7 @@ async function showAdminScreen8(tab = 'apps') {
     if ($('admin-close-btn')) $('admin-close-btn').hidden = false;
     if ($('screen8-back-btn')) $('screen8-back-btn').hidden = false;
   } else {
-    $('stage-label').textContent = 'SCREEN 8 · FR-17';
-    $('form-title').textContent = 'Pilot Administrator Workspace';
-    $('form-description').textContent = 'Review verification queue, manage material catalogue, and search transaction records.';
+    setHeaderTitles('SCREEN 8 · FR-17', 'Pilot Administrator Workspace', 'Review verification queue, manage material catalogue, and search transaction records.');
     if ($('screen8-main-heading')) $('screen8-main-heading').textContent = 'Pilot Administrator Workspace';
     const badgeEl = document.querySelector('#screen-8-container .badge-admin');
     if (badgeEl) {
@@ -3542,6 +3684,9 @@ async function initialize() {
       notice('Email verification is not available yet. Please try again later.');
     }
   } catch {
+    hideAllScreens();
+    setAsideVisible(true);
+    switchAuthTab('register');
     error('Could not connect to EcoSmart. Refresh the page to try again.');
   } finally {
     busy = false;

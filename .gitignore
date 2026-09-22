@@ -7,3 +7,5 @@ data/
 node_modules/
 *.log
 .gstack/
+review/
+*.sqlite*

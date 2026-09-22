@@ -22,8 +22,8 @@
 
     
 
-  <main id="main-container">
-    <aside id="aside-panel">
+  <main id="main-container" class="dashboard-mode">
+    <aside id="aside-panel" hidden>
       <p class="eyebrow" id="aside-eyebrow">A better next chapter</p>
       <h1 id="aside-heading">Recyclable waste.<br>Real opportunity.</h1>
       <p class="intro" id="aside-intro">Your first step towards connecting recyclable materials with the people who buy them.</p>
@@ -36,21 +36,33 @@
     </aside>
 
     <section class="card" id="card-section" aria-labelledby="form-title">
+      <!-- App Initial Loader (shown while resolving session state) -->
+      <div id="app-initial-loader" class="app-initial-loader">
+        <div class="loader-content">
+          <div class="loader-brand">
+            <span class="brand-icon">🌱</span>
+            <span class="loader-brand-title">Eco<strong>Smart</strong></span>
+          </div>
+          <div class="loader-spinner"></div>
+          <p class="loader-text">Loading your workspace…</p>
+        </div>
+      </div>
+
       <!-- Auth Switcher Tabs -->
-                  <div class="auth-tabs" id="auth-tabs" role="tablist">
+      <div class="auth-tabs" id="auth-tabs" role="tablist" hidden>
         <button type="button" class="tab-btn active" id="tab-register" role="tab" aria-selected="true">Create account</button>
         <button type="button" class="tab-btn" id="tab-login" role="tab" aria-selected="false">Sign in</button>
       </div>
 
-      <p class="eyebrow" id="stage-label">LET’S GET STARTED</p>
-      <h2 id="form-title">Create your account</h2>
-      <p id="form-description" class="muted">Tell us how you’ll use EcoSmart.</p>
+      <p class="eyebrow" id="stage-label" hidden>LET’S GET STARTED</p>
+      <h2 id="form-title" hidden>Create your account</h2>
+      <p id="form-description" class="muted" hidden>Tell us how you’ll use EcoSmart.</p>
       <p id="payment-mode-notice" class="notice" hidden></p>
       <p id="notice" class="notice" role="status" hidden></p>
       <p id="error" class="error" role="alert" tabindex="-1" hidden></p>
 
       <!-- SCREEN 1: Registration Form -->
-      <form id="registration">
+      <form id="registration" hidden>
         <fieldset><legend>I’m here to…</legend><div class="roles">
           <label class="role"><input type="radio" name="role" value="generator" required><span><strong>I have recyclable waste</strong><small>Join as a generator</small></span></label>
           <label class="role"><input type="radio" name="role" value="recycler" required><span><strong>I buy recyclable waste</strong><small>Join as a recycler</small></span></label>
@@ -537,6 +549,44 @@
         </form>
       </div>
 
+      <!-- SCREEN 2B: Mandatory Recycler Materials & Pricing Onboarding -->
+      <div id="screen-materials-setup-container" hidden>
+        <div class="onboarding-setup-header">
+          <div class="onboarding-badge-row">
+            <span class="badge badge-approved">✓ Application Approved</span>
+            <span class="count-pill">Mandatory Step</span>
+          </div>
+          <h2 class="onboarding-setup-title">Accepted Materials &amp; Estimated Prices</h2>
+          <p class="muted">Select which materials you buy, set your estimated price in Naira (₦), and pick a unit.</p>
+        </div>
+
+        <div class="alert-box-info" id="onboarding-materials-notice">
+          <div class="alert-box-icon">ℹ️</div>
+          <div class="alert-box-content">
+            <strong>Mandatory Marketplace Setup:</strong> Waste generators in your area only match with your business for materials you explicitly activate and price here. You must configure at least one material to enter your dashboard and start receiving batch listings.
+          </div>
+        </div>
+
+        <div class="materials-section-meta-row">
+          <span class="non-binding-notice">Estimates only · Not final offers</span>
+        </div>
+
+        <form id="onboarding-materials-form">
+          <div id="onboarding-materials-error" class="error" hidden></div>
+
+          <div id="onboarding-materials-list" class="materials-grid">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+
+          <div class="onboarding-setup-actions">
+            <button type="submit" class="primary btn-large" id="onboarding-save-materials-btn">
+              Save &amp; Launch Dashboard <span aria-hidden="true">→</span>
+            </button>
+            <p class="footnote">You can adjust your prices or add more materials anytime later from your dashboard.</p>
+          </div>
+        </form>
+      </div>
+
       <!-- SCREEN 4: Recycler Marketplace Dashboard -->
       <div id="screen-4-container" hidden>
         <!-- Dashboard Header -->
@@ -632,6 +682,7 @@
         </div>
 
         <div class="card-footer-nav">
+          <button id="btn-edit-materials-onboarding" type="button" class="text-button-subtle">Accepted Materials Setup</button>
           <button id="back-to-screen2-btn" type="button" class="text-button-subtle">View Verification Profile</button>
           <button id="dash-logout-btn" type="button" class="text-button">Sign out</button>
         </div>

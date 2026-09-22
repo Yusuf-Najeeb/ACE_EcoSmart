@@ -279,8 +279,119 @@ test('Recycler application, approval, and marketplace settings survive database 
     const alumSetting = stateData.materialSettings.find(s => s.material_id === 'aluminium');
     assert.equal(alumSetting.price, 950);
     assert.equal(alumSetting.unit, 'per kilogram');
+    assert.equal(stateData.hasConfiguredMaterials, true);
   } finally {
     await new Promise(resolve => second.server.close(resolve));
     second.db.close();
   }
 });
+
+test('Mandatory materials onboarding: unconfigured recycler has hasConfiguredMaterials=false and is invisible to generators until saved', async t => {
+  const { readFileSync } = await import('node:fs');
+  const { resolve } = await import('node:path');
+
+  // Verify HTML structure contains the dedicated onboarding container and form
+  const html = readFileSync(resolve('public/index.html'), 'utf-8');
+  assert.ok(html.includes('id="screen-materials-setup-container"'), 'screen-materials-setup-container exists');
+  assert.ok(html.includes('id="onboarding-materials-form"'), 'onboarding-materials-form exists');
+  assert.ok(html.includes('id="onboarding-materials-list"'), 'onboarding-materials-list exists');
+  assert.ok(html.includes('id="onboarding-save-materials-btn"'), 'onboarding-save-materials-btn exists');
+
+  const app = await fixture(t);
+
+  function makeClient() {
+    let clientCookie = '';
+    async function req(path, data, headers = {}) {
+      const response = await fetch(`http://127.0.0.1:${app.server.address().port}${path}`, {
+        method: data === undefined ? 'GET' : 'POST',
+        headers: { Origin: 'http://localhost:3000', 'Content-Type': 'application/json', Cookie: clientCookie, ...headers },
+        body: data === undefined ? undefined : JSON.stringify(data)
+      });
+      const jar = Object.fromEntries(clientCookie.split('; ').filter(Boolean).map(x => x.split('=')));
+      for (const item of response.headers.getSetCookie()) {
+        const [key, value] = item.split(';')[0].split('=');
+        jar[key] = value;
+      }
+      clientCookie = Object.entries(jar).map(([k, v]) => `${k}=${v}`).join('; ');
+      return { status: response.status, data: await response.json(), headers: response.headers };
+    }
+    async function reg(details) {
+      await req('/api/register', details);
+      const code = app.messages.at(-1)?.code;
+      return await req('/api/verify', { code });
+    }
+    return { req, reg };
+  }
+
+  const genClient = makeClient();
+  const recClient = makeClient();
+
+  // Register generator
+  const genVerified = await genClient.reg(generatorDetails);
+  assert.equal(genVerified.status, 200);
+
+  // Register recycler
+  const recVerified = await recClient.reg({
+    role: 'recycler',
+    name: 'Green Earth Recyclers',
+    email: 'greenearth@test.ng',
+    area: 'Ikeja, Lagos'
+  });
+  assert.equal(recVerified.status, 200);
+
+  // Submit application
+  const appRes = await recClient.req('/api/recycler/application', {
+    businessName: 'Green Earth Recyclers Ltd',
+    contactPhone: '+234 809 111 2222',
+    businessAddress: '10 Acme Road, Ikeja',
+    govIdType: 'National Identity Number (NIN)',
+    govIdNumber: '99988877766',
+    govIdFile: 'data:image/png;base64,doc',
+    photoFile: 'data:image/png;base64,photo',
+    licenceType: 'CAC Business Registration',
+    licenceNumber: 'RC-554433',
+    licenceFile: 'data:image/png;base64,licence',
+    area: 'Ikeja, Lagos'
+  });
+  assert.equal(appRes.status, 200);
+
+  // Admin approves application
+  const approveRes = await adminRequest(app, '/api/admin/review-application', {
+    applicationId: appRes.data.application.id,
+    decision: 'approved',
+    note: 'Approved'
+  });
+  assert.equal(approveRes.status, 200);
+
+  // Check state: approved but has NOT configured materials yet
+  const stateBefore = await recClient.req('/api/state');
+  assert.equal(stateBefore.data.user.accountStatus, 'active');
+  assert.equal(stateBefore.data.hasConfiguredMaterials, false, 'Expected hasConfiguredMaterials to be false before saving settings');
+
+  // Generator searches for cardboard: Green Earth Recyclers should NOT appear
+  const matchesBefore = await genClient.req('/api/generator/matches?materialId=cardboard');
+  const foundBefore = (matchesBefore.data.matches || []).find(m => m.businessName === 'Green Earth Recyclers Ltd');
+  assert.equal(foundBefore, undefined, 'Recycler must NOT appear in matches before configuring materials');
+
+  // Recycler completes mandatory onboarding step: saves accepted materials
+  const saveRes = await recClient.req('/api/recycler/settings', {
+    settings: [
+      { materialId: 'cardboard', accepted: true, price: 140, unit: 'per kilogram' },
+      { materialId: 'pet_plastic_bottles', accepted: true, price: 190, unit: 'per kilogram' }
+    ],
+    availability: 'available'
+  });
+  assert.equal(saveRes.status, 200);
+  assert.equal(saveRes.data.hasConfiguredMaterials, true);
+
+  // Check state: now hasConfiguredMaterials is true
+  const stateAfter = await recClient.req('/api/state');
+  assert.equal(stateAfter.data.hasConfiguredMaterials, true, 'Expected hasConfiguredMaterials to be true after saving settings');
+
+  // Generator searches for cardboard: Green Earth Recyclers NOW APPEARS!
+  const matchesAfter = await genClient.req('/api/generator/matches?materialId=cardboard');
+  const foundAfter = (matchesAfter.data.matches || []).find(m => m.businessName === 'Green Earth Recyclers Ltd');
+  assert.ok(foundAfter, 'Recycler must appear in matches after configuring materials');
+  assert.equal(foundAfter.estimatedPrice, 140);
+});
+
